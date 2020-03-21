@@ -1,6 +1,6 @@
 package waterSystem;
 
-public enum CalculationDirection {
+public enum FlowDirection {
 	DIRECT,
 	REVERSE
 }

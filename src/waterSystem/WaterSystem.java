@@ -12,7 +12,7 @@ public class WaterSystem {
 	int numberOfPipelines=0;
 	int[][] adjacencyMatrix;
 	int[] typesArray;
-	static CalculationDirection direction;
+	static FlowDirection direction;
 	
 	public static void main(String[] args) {
 		WaterSystem ws=new WaterSystem();
@@ -25,11 +25,11 @@ public class WaterSystem {
 		ws.createDefaultNetwork();
 
 		ws.manualWork(6);
-		System.out.println("");
+		//System.out.println("");
 		}
 	
 	public void manualWork(int rounds) {
-		direction= CalculationDirection.DIRECT;
+		direction= FlowDirection.DIRECT;
 		this.pump.startPump(direction);
 		this.pump.getRWP();
 		for(int i=0; i<rounds; i++) {
@@ -62,10 +62,10 @@ public class WaterSystem {
 	}
 	
 	public void changeCalculationDirection() {
-		if(direction==CalculationDirection.DIRECT) {
-			direction= CalculationDirection.REVERSE;
+		if(direction== FlowDirection.DIRECT) {
+			direction= FlowDirection.REVERSE;
 		}else {
-			direction=CalculationDirection.DIRECT;
+			direction= FlowDirection.DIRECT;
 		}
 	}
 

@@ -143,7 +143,7 @@ public abstract class WaterDevice extends WorkingPoint{
 		return allowTransfer;
 	}
 	
-	public void calculateGatesToWP(CalculationDirection direction) {
+	public void calculateGatesToWP(FlowDirection direction) {
 			double sumFlow=0;
 			double avgPressure=0;
 			switch(direction) {
@@ -172,7 +172,7 @@ public abstract class WaterDevice extends WorkingPoint{
 			}
 	}
 	
-	public void calculateWPtoGates(CalculationDirection direction) {
+	public void calculateWPtoGates(FlowDirection direction) {
 		double sumFlow=0;
 		
 		switch(direction) {
@@ -216,7 +216,7 @@ public abstract class WaterDevice extends WorkingPoint{
 			break;
 		}
 	}
-	public void distributeWater(CalculationDirection direction) {
+	public void distributeWater(FlowDirection direction) {
 		if(allowDistribution) {
 			calculateGatesToWP(direction);
 			calculateWPtoGates(direction);
@@ -265,7 +265,7 @@ public abstract class WaterDevice extends WorkingPoint{
 		return isOK;
 	}
 	
-	public void setDeviceStatus (CalculationDirection direction){
+	public void setDeviceStatus (FlowDirection direction){
 		switch(direction) {
 		
 		case DIRECT:
@@ -301,7 +301,7 @@ public abstract class WaterDevice extends WorkingPoint{
 		}
 	}
 
-	public int findGate(CalculationDirection direction, WaterDevice source) {
+	public int findGate(FlowDirection direction, WaterDevice source) {
 		int ret=-1;
 		int i=0;
 		switch(direction) {

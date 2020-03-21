@@ -17,7 +17,7 @@ public class Pump extends WaterDevice{
 		setName("SHE 40-200/75");
 	}
 	
-	public void startPump(CalculationDirection direction) {
+	public void startPump(FlowDirection direction) {
 		double midFlow =(curvePoints[0].getFlow()+curvePoints[curvePoints.length-1].getFlow())/2;
 		double startFlow = 39;
 		setNewWorkingPointBy(FlowPressure.FLOW, startFlow);
@@ -42,13 +42,13 @@ public class Pump extends WaterDevice{
 	}
 	
 	@Override
-	public void distributeWater(CalculationDirection direction) {
-		CalculationDirection aDirection;
+	public void distributeWater(FlowDirection direction) {
+		FlowDirection aDirection;
 		
-		if(direction.equals(CalculationDirection.DIRECT)) {
-			aDirection=CalculationDirection.REVERSE;
+		if(direction.equals(FlowDirection.DIRECT)) {
+			aDirection= FlowDirection.REVERSE;
 		}else {
-			aDirection=CalculationDirection.DIRECT;
+			aDirection= FlowDirection.DIRECT;
 		}
 		
 		if(allowDistribution) {

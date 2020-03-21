@@ -45,13 +45,13 @@ public class Sprinkler extends WaterDevice{
 	}
 
 	@Override
-	public void distributeWater(CalculationDirection direction) {
-		CalculationDirection aDirection;
+	public void distributeWater(FlowDirection direction) {
+		FlowDirection aDirection;
 		
-		if(direction.equals(CalculationDirection.DIRECT)) {
-			aDirection=CalculationDirection.REVERSE;
+		if(direction.equals(FlowDirection.DIRECT)) {
+			aDirection= FlowDirection.REVERSE;
 		}else {
-			aDirection=CalculationDirection.DIRECT;
+			aDirection= FlowDirection.DIRECT;
 		}
 		
 		if(allowDistribution) {
