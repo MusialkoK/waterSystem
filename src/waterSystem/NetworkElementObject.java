@@ -1,6 +1,6 @@
 package waterSystem;
 
-import waterSystem.netConnections.LinkObservable;
+import waterSystem.observersInterfaces.LinkObservable;
 
 public class NetworkElementObject extends NetworkElement {
 

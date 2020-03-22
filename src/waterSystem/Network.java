@@ -1,20 +1,22 @@
 package waterSystem;
 
 
-import waterSystem.netConnections.DirectionObservable;
-import waterSystem.netConnections.DirectionObserver;
+import waterSystem.observersInterfaces.DirectionObservable;
+import waterSystem.observersInterfaces.DirectionObserver;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static waterSystem.FlowDirection.DIRECT;
+import static waterSystem.FlowDirection.*;
 
 public class Network implements DirectionObservable {
     private List<DirectionObserver> directionObservers;
     private FlowDirection flowDirection;
+    private List<NetworkElement> networkElements;
 
     public Network() {
         this.directionObservers = new ArrayList<>();
+        this.networkElements=new ArrayList<>();
         this.flowDirection = DIRECT;
     }
 
@@ -33,5 +35,19 @@ public class Network implements DirectionObservable {
         for (DirectionObserver directionObserver:directionObservers) {
             directionObserver.update(this.flowDirection);
         }
+    }
+
+    public void addNetworkElement(NetworkElement networkElement){
+        this.networkElements.add(networkElement);
+        addObserver(networkElement.connections);
+    }
+
+    public NetworkElement getNetworkElementOf(int index){
+        return this.networkElements.get(index);
+    }
+
+    public void changeFlowDirection(){
+        flowDirection = DIRECT.equals(flowDirection) ? REVERSE:DIRECT;
+        sendUpdate();
     }
 }

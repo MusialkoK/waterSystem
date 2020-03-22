@@ -1,4 +1,4 @@
-package waterSystem.netConnections;
+package waterSystem.observersInterfaces;
 
 import waterSystem.FlowDirection;
 

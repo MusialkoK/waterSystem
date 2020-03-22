@@ -1,24 +1,29 @@
 package waterSystem;
 
-import waterSystem.netConnections.LinkObservable;
-import waterSystem.netConnections.LinkObserver;
+import waterSystem.observersInterfaces.LinkObservable;
+import waterSystem.observersInterfaces.LinkObserver;
 
 
 public abstract class NetworkElement implements LinkObserver, LinkObservable {
 
+    private static int numberOfElements = 0;
+
     protected Connections connections;
     protected String testField;
+    private int IDNumber;
 
-    public NetworkElement(LinkObservable...o) {
-        connections=new Connections();
-        for (LinkObservable linkObservable:o) {
+    public NetworkElement(LinkObservable... o) {
+        connections = new Connections();
+        for (LinkObservable linkObservable : o) {
             linkObservable.addObserver(this);
+            IDNumber = numberOfElements++;
         }
     }
 
     public NetworkElement() {
-        connections=new Connections();
-        testField="im first";
+        connections = new Connections();
+        IDNumber = numberOfElements++;
+
     }
 
     @Override
@@ -33,18 +38,19 @@ public abstract class NetworkElement implements LinkObserver, LinkObservable {
 
     @Override
     public void sendUpdate() {
-        for (LinkObserver obs:connections.getLinkObservers()) {
+        for (LinkObserver obs : connections.getLinkObservers()) {
             obs.update(this.testField);
         }
     }
 
     @Override
     public void update(String update) {
-        this.testField=update;
+        this.testField = update;
+        System.out.println("I am number " + IDNumber + " my message: " + this.testField);
         sendUpdate();
     }
 
-    public String getValue(){
+    public String getValue() {
         return this.testField;
     }
 }

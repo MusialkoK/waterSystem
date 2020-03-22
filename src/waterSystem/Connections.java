@@ -1,8 +1,7 @@
 package waterSystem;
 
-import waterSystem.netConnections.DirectionObserver;
-import waterSystem.netConnections.LinkObservable;
-import waterSystem.netConnections.LinkObserver;
+import waterSystem.observersInterfaces.DirectionObserver;
+import waterSystem.observersInterfaces.LinkObserver;
 
 import java.util.ArrayList;
 import java.util.List;
