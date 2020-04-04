@@ -28,4 +28,8 @@ public class Connections implements DirectionObserver {
     public List<LinkObserver> getLinkObservers() {
         return (DIRECT.equals(this.flowDirection)) ? this.directLinkObservers : this.reverseLinkObservers;
     }
+
+    public List<LinkObserver> getReverseLinkObservers(){
+        return this.reverseLinkObservers;
+    }
 }

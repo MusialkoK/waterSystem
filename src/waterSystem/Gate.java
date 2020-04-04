@@ -3,18 +3,18 @@ package waterSystem;
 
 public class Gate extends WorkingPoint {
 
-		Pipeline withPipeline; 
+		OldPipeline withOldPipeline;
 		WaterDevice toDevice;
 		boolean GateOpen=true;
 		// true - waiting for data - do not calculate of transfer
 		// false - data received - ready to calculate or transfer
 		
-		public Pipeline getWithPipeline() {
-			return withPipeline;
+		public OldPipeline getWithOldPipeline() {
+			return withOldPipeline;
 		}
 
-		public void setWithPipeline(Pipeline pipe) {
-			this.withPipeline = pipe;
+		public void setWithOldPipeline(OldPipeline pipe) {
+			this.withOldPipeline = pipe;
 		}
 
 		public WaterDevice getToDevice() {

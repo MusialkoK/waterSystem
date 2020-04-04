@@ -1,14 +1,14 @@
 
 package waterSystem;
 
-public class Node extends WaterDevice {
+public class OldNode extends WaterDevice {
 
 	
-	public Node(int i) {
+	public OldNode(int i) {
 		super(i);
 	}
 
-	public Node(String def, int i) {
+	public OldNode(String def, int i) {
 		super(def, i);
 	}
 

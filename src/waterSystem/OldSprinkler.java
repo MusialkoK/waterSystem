@@ -1,6 +1,6 @@
 package waterSystem;
 
-public class Sprinkler extends WaterDevice{
+public class OldSprinkler extends WaterDevice{
 
 	public void setDefault() {
 		int quantity=190;
@@ -33,13 +33,13 @@ public class Sprinkler extends WaterDevice{
 		setName("R-VAN-SST 1,5x9,1m");	
 	}
 
-	public Sprinkler(int i) {
+	public OldSprinkler(int i) {
 		super(i);
 		// TODO Auto-generated constructor stub
 	}
 
 
-	public Sprinkler(String def, int i) {
+	public OldSprinkler(String def, int i) {
 		super(def, i);
 		// TODO Auto-generated constructor stub
 	}

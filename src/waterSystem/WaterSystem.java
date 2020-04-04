@@ -2,10 +2,10 @@ package waterSystem;
 
 public class WaterSystem {
 	static WaterDevice[] netElements = new WaterDevice[20];
-	Pump pump;
-	Node[] nodes = new Node[10];
-	Sprinkler[] sprinklers = new Sprinkler[10];
-	Pipeline[] pipelines = new Pipeline[10];
+	OldPump oldPump;
+	OldNode[] oldNodes = new OldNode[10];
+	OldSprinkler[] oldSprinklers = new OldSprinkler[10];
+	OldPipeline[] oldPipelines = new OldPipeline[10];
 	int numberOfElements=0;
 	int numberOfNodes=0;
 	int numberOfSprinklers=0;
@@ -30,8 +30,8 @@ public class WaterSystem {
 	
 	public void manualWork(int rounds) {
 		direction= FlowDirection.DIRECT;
-		this.pump.startPump(direction);
-		this.pump.getRWP();
+		this.oldPump.startPump(direction);
+		this.oldPump.getRWP();
 		for(int i=0; i<rounds; i++) {
 			this.transfer(netElements[0]);
 			netElements[1].setDeviceStatus(direction);
@@ -55,7 +55,7 @@ public class WaterSystem {
 			netElements[0].distributeWater(direction);
 			this.changeCalculationDirection();
 			netElements[0].setDeviceStatus(direction);
-			this.pump.getRWP();
+			this.oldPump.getRWP();
 			System.out.println();
 		}
 
@@ -101,28 +101,28 @@ public class WaterSystem {
 	public void createDefaultNetwork() {
 		for (int i = 0; i < numberOfElements; i++) {
 			if(typesArray[i]==0) {
-				pump = new Pump("default",i);
-				netElements[i] = pump;
+				oldPump = new OldPump("default",i);
+				netElements[i] = oldPump;
 			}else if(typesArray[i]==1) {
-				nodes[numberOfNodes] = new Node("default",i);
-				netElements[i] = nodes[numberOfNodes];
+				oldNodes[numberOfNodes] = new OldNode("default",i);
+				netElements[i] = oldNodes[numberOfNodes];
 				numberOfNodes++;
 			}else {
-				sprinklers[numberOfSprinklers] = new Sprinkler("default",i);
-				netElements[i] = sprinklers[numberOfSprinklers];
+				oldSprinklers[numberOfSprinklers] = new OldSprinkler("default",i);
+				netElements[i] = oldSprinklers[numberOfSprinklers];
 				numberOfSprinklers++;
 			}
 		}
 		
 		for(int i =0; i<numberOfPipelines;i++) {
-			pipelines[i]= new Pipeline("default",i);
+			oldPipelines[i]= new OldPipeline("default",i);
 		}
 		
 		for(int i=0; i<numberOfElements; i++) {
 			for(int j=0; j<numberOfElements; j++) {
 				if(adjacencyMatrix[j][i]!=-1) {
 					WaterDevice wd=netElements[j];
-					Pipeline p=pipelines[adjacencyMatrix[j][i]];
+					OldPipeline p= oldPipelines[adjacencyMatrix[j][i]];
 					netElements[i].setOutGate(wd, p);
 					}
 				}
@@ -132,7 +132,7 @@ public class WaterSystem {
 				for(int j=0; j<numberOfElements; j++) {
 					if(adjacencyMatrix[i][j]!=-1) {
 						WaterDevice wd=netElements[j];
-						Pipeline p=pipelines[adjacencyMatrix[i][j]];
+						OldPipeline p= oldPipelines[adjacencyMatrix[i][j]];
 						netElements[i].setInGate(wd, p);
 					}
 				}
@@ -145,7 +145,7 @@ public class WaterSystem {
 			switch(direction) {
 			case DIRECT:
 				for(int i=0; i<wd.activeOutGates; i++) {
-					Pipeline pipe=wd.outGates[i].withPipeline;
+					OldPipeline pipe=wd.outGates[i].withOldPipeline;
 					WaterDevice dest=wd.outGates[i].toDevice;
 					int gatePlace=dest.findGate(direction, wd);
 					pipe.setNewWorkingPointBy(FlowPressure.FLOW, wd.outGates[i].getFlow());
@@ -156,7 +156,7 @@ public class WaterSystem {
 				break;
 			case REVERSE:
 				for(int i=0; i<wd.activeInGates; i++) {
-					Pipeline pipe=wd.inGates[i].withPipeline;
+					OldPipeline pipe=wd.inGates[i].withOldPipeline;
 					WaterDevice dest=wd.inGates[i].toDevice;
 					int gatePlace=dest.findGate(direction, wd);
 					pipe.setNewWorkingPointBy(FlowPressure.FLOW, wd.inGates[i].getFlow());

@@ -233,18 +233,18 @@ public abstract class WaterDevice extends WorkingPoint{
 		number=i;
 	}
 
-	public void setInGate(WaterDevice wd, Pipeline p) {
+	public void setInGate(WaterDevice wd, OldPipeline p) {
 		Gate gt = new Gate();
 		gt.setToDevice(wd);
-		gt.setWithPipeline(p);
+		gt.setWithOldPipeline(p);
 		inGates[activeInGates]=gt;
 		activeInGates++;
 	}
 	
-	public void setOutGate(WaterDevice wd, Pipeline p) {
+	public void setOutGate(WaterDevice wd, OldPipeline p) {
 		Gate gt = new Gate();
 		gt.setToDevice(wd);
-		gt.setWithPipeline(p);
+		gt.setWithOldPipeline(p);
 		outGates[activeOutGates]=gt;
 		activeOutGates++;	
 	}
