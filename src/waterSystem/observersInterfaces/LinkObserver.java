@@ -1,6 +1,10 @@
 package waterSystem.observersInterfaces;
 
+import waterSystem.WaterConditions;
+
+import java.util.Map;
+
 public interface LinkObserver {
 
-    void update(String update);
+    void update(LinkObservable observable, WaterConditions waterConditions);
 }

@@ -1,5 +1,6 @@
 package waterSystem;
 
+import waterSystem.calculationStrategies.CalculateStrategy;
 import waterSystem.observersInterfaces.LinkObservable;
 import waterSystem.observersInterfaces.LinkObserver;
 import waterSystem.models.ModelsLists;
@@ -11,8 +12,10 @@ public abstract class NetworkElement implements LinkObserver, LinkObservable {
 
     protected Connections connections;
     protected String testField;
-    private int IDNumber;
-    private WaterConditions waterConditions;
+    protected int IDNumber;
+    protected WaterConditions waterConditions;
+    protected CalculateStrategy calculateStrategy;
+
 
     public NetworkElement create(ModelsLists model, LinkObservable... connections){
         addToNetwork(connections);
@@ -30,9 +33,23 @@ public abstract class NetworkElement implements LinkObserver, LinkObservable {
         this.waterConditions.setFlowAndPressure(flow, pressure);
     }
 
+    public Connections getConnections() {
+        return connections;
+    }
+
+    public WaterConditions getWaterConditions() {
+        return waterConditions;
+    }
+
+    public void changeCalculateStrategy(CalculateStrategy calculateStrategy) {
+        this.calculateStrategy = calculateStrategy;
+    }
+
     protected abstract void setParameters(ModelsLists model);
 
-    public abstract void calculate();
+    public void calculate(){
+        calculateStrategy.calculate();
+    };
 
     @Override
     public void addObserver(LinkObserver o) {
@@ -47,19 +64,16 @@ public abstract class NetworkElement implements LinkObserver, LinkObservable {
     @Override
     public void sendUpdate() {
         for (LinkObserver obs : connections.getLinkObservers()) {
-            obs.update(this.testField);
+            obs.update(this,waterConditions);
         }
     }
 
     @Override
-    public void update(String update) {
-        this.testField = update;
+    public void update(LinkObservable observable, WaterConditions waterConditions) {
+        this.connections.getObservables().put(observable,waterConditions);
+        calculate();
         sendMessage();
         sendUpdate();
-    }
-
-    public String getValue() {
-        return this.testField;
     }
 
     public void sendMessage(){
@@ -70,7 +84,7 @@ public abstract class NetworkElement implements LinkObserver, LinkObservable {
         return IDNumber;
     }
 
-    private void setQuantity(int quantity) {
+    protected void setQuantity(int quantity) {
     }
 
     private void addToReverse(LinkObservable o){

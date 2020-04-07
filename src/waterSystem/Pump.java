@@ -15,13 +15,21 @@ public class Pump extends NetworkElement {
     }
 
     public void changeModelTo(ModelsLists model) {
+        String oldPumpName = getName();
         setParameters(model);
-        sendMessage();
+        System.out.println("Pump changed " + oldPumpName + " --> " + getName() + "\n--------------------------\n");
     }
 
     public void start(){
-        double flow=20;
-        setWaterConditions(flow,waterCurve.getPressureOnFlow(flow));
+        double flow=43;
+        setWaterConditions(flow, getPressureOnFlow(flow));
+        System.out.println("pump "+getName()+" started at: "+waterConditions.view());
+        System.out.println("-------------------");
+        sendUpdate();
+    }
+
+    private double getPressureOnFlow(double flow){
+        return waterCurve.getPressureOnFlow(flow);
     }
 
     @Override
@@ -37,10 +45,9 @@ public class Pump extends NetworkElement {
 
     @Override
     public void sendMessage() {
-        final String HELLO_PUMP_FORMAT ="pump %s reporting:\nMy ID: %d\nMy message: %s\n-------------------\n";
-        System.out.printf(HELLO_PUMP_FORMAT,getName(),getIDNumber(),this.testField);
-
+        final String HELLO_PUMP_FORMAT ="pump %s reporting:\nMy ID: %d\nWater conditions: %s\n";
+        System.out.printf(HELLO_PUMP_FORMAT,getName(),getIDNumber(),waterConditions.view());
+        System.out.println("-------------------");
     }
-
 }
 

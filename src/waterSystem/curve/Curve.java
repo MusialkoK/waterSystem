@@ -38,7 +38,7 @@ public class Curve {
     }
 
     public double getPressureOnFlow(double flow) {
-        int inRange = inRange(flow, minPressure, maxPressure);
+        int inRange = inRange(flow, minFlow, maxFlow);
         switch (inRange) {
             case 0:
                 return findSection(FLOW, flow).getPressureOnFlow(flow);

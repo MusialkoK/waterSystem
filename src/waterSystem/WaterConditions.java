@@ -1,8 +1,8 @@
 package waterSystem;
 
 public class WaterConditions implements Comparable<WaterConditions>{
-    double flow;
-    double pressure;
+    private double flow;
+    private double pressure;
 
 
     public WaterConditions(double flow, double pressure) {
@@ -37,5 +37,9 @@ public class WaterConditions implements Comparable<WaterConditions>{
     @Override
     public int compareTo(WaterConditions waterConditions) {
         return Double.compare(this.flow,waterConditions.flow);
+    }
+
+    public String view(){
+        return getFlow()+"m3/h @"+getPressure()+"atm";
     }
 }

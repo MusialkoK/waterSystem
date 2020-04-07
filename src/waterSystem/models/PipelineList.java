@@ -2,7 +2,8 @@ package waterSystem.models;
 
 public enum PipelineList implements ModelsLists {
 
-    PE_50("PE50",50,46);
+    PE_50("PE50",50,40.8),
+    PE_90("PE90",90,73.4);
 
     private String name;
     private double externalDiameter;
