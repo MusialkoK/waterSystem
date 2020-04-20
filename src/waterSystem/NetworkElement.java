@@ -1,110 +1,100 @@
 package waterSystem;
 
-import waterSystem.calculationStrategies.CalculateStrategy;
-import waterSystem.observersInterfaces.LinkObservable;
-import waterSystem.observersInterfaces.LinkObserver;
+import waterSystem.operationController.OperationController;
+import waterSystem.operationController.calculationModule.CalculationModule;
+import waterSystem.operationController.communicationModule.CommunicationModule;
+import waterSystem.curve.Curve;
 import waterSystem.models.ModelsLists;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
-public abstract class NetworkElement implements LinkObserver, LinkObservable {
+
+public abstract class NetworkElement {
 
     private static int numberOfElements = 0;
 
-    protected Connections connections;
-    protected String testField;
+    protected OperationController<WaterConditions> flowController;
+    protected OperationController<FlowDirection> directionController;
     protected int IDNumber;
     protected WaterConditions waterConditions;
-    protected CalculateStrategy calculateStrategy;
+    protected CalculationModule calculationModule;
+    protected Curve waterCurve;
+    protected ModelsLists model;
+    protected double multiplier;
 
 
-    public NetworkElement create(ModelsLists model, LinkObservable... connections){
-        addToNetwork(connections);
-        setParameters(model);
+    public NetworkElement create(ModelsLists model, List<NetworkElement> networkElements) {
+        addToNetwork(networkElements);
+        setModelParameters(model);
         return this;
     }
 
-    public NetworkElement create(ModelsLists model, int quantity, LinkObservable... connections){
-        create(model, connections);
-        setQuantity(quantity);
+    public NetworkElement create(ModelsLists model, int quantity, List<NetworkElement> networkElements){
+        create(model, networkElements);
+        setMultiplier(quantity);
         return this;
+    }
+
+    public OperationController<WaterConditions> getFlowController() {
+        return flowController;
+    }
+
+    public OperationController<FlowDirection> getDirectionController() {
+        return directionController;
+    }
+
+    public Curve getWaterCurve() {
+        return waterCurve;
     }
 
     public void setWaterConditions(double flow, double pressure) {
         this.waterConditions.setFlowAndPressure(flow, pressure);
     }
 
-    public Connections getConnections() {
-        return connections;
+    public void setWaterConditions(WaterConditions waterConditions){
+        setWaterConditions(waterConditions.getFlow(),waterConditions.getPressure());
     }
 
     public WaterConditions getWaterConditions() {
         return waterConditions;
     }
 
-    public void changeCalculateStrategy(CalculateStrategy calculateStrategy) {
-        this.calculateStrategy = calculateStrategy;
-    }
+    protected abstract void setModelParameters(ModelsLists model);
 
-    protected abstract void setParameters(ModelsLists model);
-
-    public void calculate(){
-        calculateStrategy.calculate();
-    };
-
-    @Override
-    public void addObserver(LinkObserver o) {
-        connections.getLinkObservers().add(o);
-    }
-
-    @Override
-    public void deleteObserver(LinkObserver o) {
-        connections.getLinkObservers().remove(o);
-    }
-
-    @Override
-    public void sendUpdate() {
-        for (LinkObserver obs : connections.getLinkObservers()) {
-            obs.update(this,waterConditions);
-        }
-    }
-
-    @Override
-    public void update(LinkObservable observable, WaterConditions waterConditions) {
-        this.connections.getObservables().put(observable,waterConditions);
-        calculate();
-        sendMessage();
-        sendUpdate();
+    protected void setCalculationParameters(CalculationModule<WaterConditions> flowModule,
+                                            CalculationModule<FlowDirection> directionModule){
+        this.flowController.setCalculationModule(flowModule);
+        this.directionController.setCalculationModule(directionModule);
     }
 
     public void sendMessage(){
-        System.out.println("I am number " + IDNumber + " my message: " + this.testField);
     }
 
     public int getIDNumber(){
         return IDNumber;
     }
 
-    protected void setQuantity(int quantity) {
+    protected void setMultiplier(double multiplier) {
+        this.multiplier=multiplier;
     }
 
-    private void addToReverse(LinkObservable o){
-        this.connections.getReverseLinkObservers().add((LinkObserver) o);
-    }
-
-    protected void addToNetwork(LinkObservable...connections){
-        this.connections = new Connections();
+    protected void addToNetwork(List<NetworkElement> networkElements){
+        this.flowController = new OperationController<>();
+        this.directionController = new OperationController<>();
         waterConditions = new WaterConditions();
         IDNumber = numberOfElements++;
-        setConnections(connections);
-
+        connectTo(networkElements);
     }
 
-    private void setConnections(LinkObservable...connections){
-        if(connections.length>0){
-            for (LinkObservable linkObservable : connections) {
-                linkObservable.addObserver(this);
-                addToReverse(linkObservable);
-            }
-        }
+    private void connectTo(List<NetworkElement> networkElements){
+        List<OperationController<WaterConditions>> flowList = networkElements.stream()
+                .map(x->x.flowController).collect(Collectors.toList());
+        flowController.addConnectionTo(flowList);
+
+        List<OperationController<FlowDirection>> directionList = networkElements.stream()
+                .map(x->x.directionController).collect(Collectors.toList());
+        directionController.addConnectionTo(directionList);
     }
+
 }

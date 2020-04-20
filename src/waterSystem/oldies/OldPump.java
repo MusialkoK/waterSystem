@@ -1,4 +1,7 @@
-package waterSystem;
+package waterSystem.oldies;
+
+import waterSystem.FlowDirection;
+import waterSystem.FlowPressure;
 
 public class OldPump extends WaterDevice{
 	

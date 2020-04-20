@@ -1,4 +1,6 @@
-package waterSystem;
+package waterSystem.oldies;
+
+import waterSystem.FlowPressure;
 
 public class OldPipeline extends WaterDevice {
 	double extDiameter;

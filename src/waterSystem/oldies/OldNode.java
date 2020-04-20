@@ -1,5 +1,5 @@
 
-package waterSystem;
+package waterSystem.oldies;
 
 public class OldNode extends WaterDevice {
 

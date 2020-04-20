@@ -1,4 +1,4 @@
-package waterSystem;
+package waterSystem.oldies;
 
 
 public class Gate extends WorkingPoint {

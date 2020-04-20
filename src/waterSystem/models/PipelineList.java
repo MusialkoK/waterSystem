@@ -1,5 +1,7 @@
 package waterSystem.models;
 
+import waterSystem.curve.Curve;
+
 public enum PipelineList implements ModelsLists {
 
     PE_50("PE50",50,40.8),
@@ -17,6 +19,11 @@ public enum PipelineList implements ModelsLists {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Curve getCurve() {
+        return null;
     }
 
     public double getExternalDiameter() {

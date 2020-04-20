@@ -1,4 +1,7 @@
-package waterSystem;
+package waterSystem.oldies;
+
+import waterSystem.FlowDirection;
+import waterSystem.FlowPressure;
 
 import java.util.Scanner;
 

@@ -1,4 +1,7 @@
-package waterSystem;
+package waterSystem.oldies;
+
+import waterSystem.FlowDirection;
+import waterSystem.FlowPressure;
 
 public class WaterSystem {
 	static WaterDevice[] netElements = new WaterDevice[20];

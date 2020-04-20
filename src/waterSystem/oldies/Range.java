@@ -1,4 +1,4 @@
-package waterSystem;
+package waterSystem.oldies;
 
 public enum Range {
 	DOWNRANGE,
