@@ -6,13 +6,13 @@ import waterSystem.curve.Curve;
 import waterSystem.curve.CurveZones;
 import java.util.List;
 
-public final class FinalDevice<E extends WaterConditions> implements CalculationModule<E> {
+public final class LastDevice<E extends WaterConditions> implements CalculationModule<E> {
     List<WaterConditions> inputData;
     double multiplier;
     Curve waterCurve;
     E calculatedValue;
 
-    public FinalDevice(double multiplier, Curve waterCurve) {
+    public LastDevice(double multiplier, Curve waterCurve) {
         this.multiplier=multiplier;
         this.waterCurve=waterCurve;
     }

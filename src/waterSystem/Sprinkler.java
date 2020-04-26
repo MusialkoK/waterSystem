@@ -1,6 +1,6 @@
 package waterSystem;
 
-import waterSystem.operationController.calculationModule.FinalDevice;
+import waterSystem.operationController.calculationModule.LastDevice;
 import waterSystem.operationController.calculationModule.PassDirection;
 import waterSystem.models.ModelsLists;
 import waterSystem.models.SprinklerList;
@@ -34,6 +34,6 @@ public class Sprinkler extends NetworkElement {
     protected void setModelParameters(ModelsLists model) {
         this.model = model;
         this.waterCurve= this.model.getCurve();
-        setCalculationParameters(new FinalDevice<>(multiplier,waterCurve),new PassDirection<>());
+        setCalculationParameters(new LastDevice<>(multiplier,waterCurve),new PassDirection<>());
     }
 }

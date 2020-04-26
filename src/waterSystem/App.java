@@ -14,5 +14,7 @@ public class App {
         network.addPipeline(PE_90,20,network.connectTo(0));
         network.addSprinkler(R_VAN_SST_1_5x9_1,396,network.connectTo(1));
         network.startPump();
+
+
     }
 }

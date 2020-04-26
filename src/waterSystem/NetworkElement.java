@@ -2,19 +2,19 @@ package waterSystem;
 
 import waterSystem.operationController.OperationController;
 import waterSystem.operationController.calculationModule.CalculationModule;
-import waterSystem.operationController.communicationModule.CommunicationModule;
 import waterSystem.curve.Curve;
 import waterSystem.models.ModelsLists;
+import waterSystem.operationController.communicationModule.Linked;
+import waterSystem.operationController.communicationModule.NumberedUpdate;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
-public abstract class NetworkElement {
+public abstract class NetworkElement implements Linked, Updates<WaterConditions>, ValueRetrieval<WaterConditions> {
 
     private static int numberOfElements = 0;
 
-    protected OperationController<WaterConditions> flowController;
+    protected OperationController flowController;
     protected OperationController<FlowDirection> directionController;
     protected int IDNumber;
     protected WaterConditions waterConditions;
@@ -22,7 +22,6 @@ public abstract class NetworkElement {
     protected Curve waterCurve;
     protected ModelsLists model;
     protected double multiplier;
-
 
     public NetworkElement create(ModelsLists model, List<NetworkElement> networkElements) {
         addToNetwork(networkElements);
@@ -36,12 +35,29 @@ public abstract class NetworkElement {
         return this;
     }
 
-    public OperationController<WaterConditions> getFlowController() {
-        return flowController;
+    @Override
+    public void update(NetworkElement sender, NumberedUpdate<WaterConditions> upd) {
+        flowController.update(sender,upd);
+        getFlowValues();
+        sendMessage();
+        sendFlowUpdate(waterConditions);
     }
 
-    public OperationController<FlowDirection> getDirectionController() {
-        return directionController;
+    @Override
+    public void sendUpdate(NetworkElement sender, WaterConditions value) {
+        flowController.sendUpdate(sender, value);
+    }
+
+    @Override
+    public void addConnectionTo(NetworkElement newElement, NetworkElement existingElement) {
+        flowController.addConnectionTo(this, existingElement);
+        directionController.addConnectionTo(this, existingElement);
+    }
+
+    @Override
+    public void removeConnectionTo(NetworkElement newElement, NetworkElement existingElement) {
+        flowController.removeConnectionTo(this, existingElement);
+        directionController.removeConnectionTo(this, existingElement);
     }
 
     public Curve getWaterCurve() {
@@ -75,26 +91,40 @@ public abstract class NetworkElement {
         return IDNumber;
     }
 
+
     protected void setMultiplier(double multiplier) {
         this.multiplier=multiplier;
     }
 
     protected void addToNetwork(List<NetworkElement> networkElements){
-        this.flowController = new OperationController<>();
-        this.directionController = new OperationController<>();
+        this.flowController = new OperationController<WaterConditions>();
+        this.directionController = new OperationController<FlowDirection>();
         waterConditions = new WaterConditions();
         IDNumber = numberOfElements++;
         connectTo(networkElements);
     }
 
-    private void connectTo(List<NetworkElement> networkElements){
-        List<OperationController<WaterConditions>> flowList = networkElements.stream()
-                .map(x->x.flowController).collect(Collectors.toList());
-        flowController.addConnectionTo(flowList);
+    public void flowUpdate(NetworkElement sender, NumberedUpdate<WaterConditions> upd){
+        update(sender,upd);
+    }
 
-        List<OperationController<FlowDirection>> directionList = networkElements.stream()
-                .map(x->x.directionController).collect(Collectors.toList());
-        directionController.addConnectionTo(directionList);
+    public void sendFlowUpdate(WaterConditions upd) {
+        sendUpdate(this, upd);
+    }
+
+    protected void getFlowValues(){
+        waterConditions=(WaterConditions) flowController.getCalculatedValue();
+    };
+
+
+
+    public void connectFrom(NetworkElement networkElement){
+        flowController.connectFrom(networkElement);
+        //directionController.addConnectionAfterFrom(networkElement);
+    }
+
+    private void connectTo(List<NetworkElement> networkElements){
+        networkElements.forEach(existingElement -> addConnectionTo(this, existingElement));
     }
 
 }

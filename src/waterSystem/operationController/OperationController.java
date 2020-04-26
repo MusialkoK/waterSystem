@@ -1,35 +1,60 @@
 package waterSystem.operationController;
 
+import waterSystem.Updates;
 import waterSystem.NetworkElement;
-import waterSystem.operationController.calculationModule.Calculation;
 import waterSystem.operationController.calculationModule.CalculationModule;
-import waterSystem.operationController.communicationModule.Communication;
+import waterSystem.operationController.communicationModule.Linked;
 import waterSystem.operationController.communicationModule.CommunicationModule;
 import waterSystem.operationController.communicationModule.NumberedUpdate;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public class OperationController<E> implements Updates<E>, Linked {
 
-public class OperationController<E> {
+    private CommunicationModule<E> communicationModule = new CommunicationModule<>();
+    private CalculationModule<E> calculationModule;
 
-    private Communication<E> communicationModule = new CommunicationModule<>();
-    private Calculation<E> calculationModule;
-
-    public Communication<E> getCommunicationModule() {
-        return communicationModule;
+    @Override
+    public void sendUpdate(NetworkElement sender, E upd) {
+        communicationModule.sendUpdate(sender, upd);
     }
 
+    @Override
+    public void update(NetworkElement sender, NumberedUpdate<E> upd) {
+        communicationModule.update(sender, upd);
+        calculationModule.calculate(communicationModule.getBeforeValuesByDirection());
+    }
+
+    @Override
+    public void addConnectionTo(NetworkElement newElement, NetworkElement networkElement) {
+        communicationModule.addConnectionTo(newElement, networkElement);
+    }
+
+    @Override
+    public void removeConnectionTo(NetworkElement newElement, NetworkElement existingElement) {
+
+    }
+/*
+    @Override
+    public List<E> getBeforeValuesByDirection() {
+        return null;
+    }
+
+    @Override
+    public Object getSecondValue() {
+        return null;
+    }
+*/
     public void setCalculationModule(Object obj) {
-        this.calculationModule= (CalculationModule<E>) obj;
+        this.calculationModule = (CalculationModule<E>) obj;
     }
 
-    public void sendUpdate(NumberedUpdate<E> upd){
-        communicationModule.sendUpdate(upd);
+    public E getCalculatedValue() {
+        return calculationModule.exportData();
     }
 
-    public void addConnectionTo(List<OperationController<E>> list){
-        List<Communication<E>> communicationList = list.stream()
-                .map(x->x.communicationModule).collect(Collectors.toList());
-        communicationModule.addConnectionTo(communicationList);
+    public Object getCalculatedValueSecond() {
+        return calculationModule.exportSecond();
+    }
+
+    public void connectFrom(NetworkElement networkElement) {
     }
 }

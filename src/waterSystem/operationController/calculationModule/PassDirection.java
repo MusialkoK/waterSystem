@@ -4,7 +4,7 @@ import waterSystem.FlowDirection;
 
 import java.util.List;
 
-public class PassDirection<E extends FlowDirection> implements CalculationModule<E>{
+public final class PassDirection<E extends FlowDirection> implements CalculationModule<E>{
 
     private E newValue;
 

@@ -37,11 +37,13 @@ public class Pipeline extends NetworkElement {
     @Override
     public void sendMessage() {
         final String HELLO_PIPELINE_FORMAT = "pipeline %s reporting:\nMy ID: %d\nMy length: %fm\nMy head loss: %fatm\nWater conditions: %s\n";
-        System.out.printf(HELLO_PIPELINE_FORMAT, getName(), getIDNumber(), multiplier,-headLoss, waterConditions.view());
+        System.out.printf(HELLO_PIPELINE_FORMAT, getName(), getIDNumber(), multiplier, -headLoss, waterConditions.view());
         System.out.println("-------------------");
     }
 
-    public double getHeadLoss() {
-        return this.headLoss;
+    @Override
+    protected void getFlowValues() {
+        waterConditions = flowController.getCalculatedValue();
+        headLoss = (double) flowController.getCalculatedValueSecond();
     }
 }

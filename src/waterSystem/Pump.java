@@ -1,9 +1,8 @@
 package waterSystem;
 
 
-import waterSystem.operationController.calculationModule.FinalDevice;
+import waterSystem.operationController.calculationModule.LastDevice;
 import waterSystem.operationController.calculationModule.PassDirection;
-import waterSystem.operationController.communicationModule.NumberedUpdate;
 import waterSystem.models.ModelsLists;
 
 
@@ -24,8 +23,7 @@ public class Pump extends NetworkElement {
         setWaterConditions(flow, getPressureOnFlow(flow));
         System.out.println("pump " + getName() + " started at: " + waterConditions.view());
         System.out.println("-------------------");
-        NumberedUpdate<WaterConditions> updateInfo = new NumberedUpdate<>(1, getWaterConditions());
-        flowController.sendUpdate(updateInfo);
+        sendFlowUpdate(getWaterConditions());
     }
 
     private double getPressureOnFlow(double flow) {
@@ -37,7 +35,7 @@ public class Pump extends NetworkElement {
         this.model = model;
         this.waterCurve = this.model.getCurve();
         this.setMultiplier(1);
-        setCalculationParameters(new FinalDevice<>(multiplier,waterCurve),new PassDirection<>());
+        setCalculationParameters(new LastDevice<>(multiplier,waterCurve),new PassDirection<>());
     }
 
     @Override
