@@ -4,13 +4,11 @@ import waterSystem.operationController.OperationController;
 import waterSystem.operationController.calculationModule.CalculationModule;
 import waterSystem.curve.Curve;
 import waterSystem.models.ModelsLists;
-import waterSystem.operationController.communicationModule.Linked;
-import waterSystem.operationController.communicationModule.NumberedUpdate;
 
 import java.util.List;
 
 
-public abstract class NetworkElement implements Linked, Updates<WaterConditions>, ValueRetrieval<WaterConditions> {
+public abstract class NetworkElement implements ValueObserver{
 
     private static int numberOfElements = 0;
 
@@ -36,28 +34,26 @@ public abstract class NetworkElement implements Linked, Updates<WaterConditions>
     }
 
     @Override
-    public void update(NetworkElement sender, NumberedUpdate<WaterConditions> upd) {
-        flowController.update(sender,upd);
-        getFlowValues();
-        sendMessage();
-        sendFlowUpdate(waterConditions);
+    public void transfer(Object value) {
+        if(value instanceof WaterConditions){
+            waterConditions=(WaterConditions) value;
+        }
     }
 
-    @Override
-    public void sendUpdate(NetworkElement sender, WaterConditions value) {
-        flowController.sendUpdate(sender, value);
+    public void sendFlowUpdate(WaterConditions value) {
+        flowController.sendUpdate(value);
     }
 
-    @Override
-    public void addConnectionTo(NetworkElement newElement, NetworkElement existingElement) {
-        flowController.addConnectionTo(this, existingElement);
-        directionController.addConnectionTo(this, existingElement);
+
+    public void addConnectionTo(NetworkElement existingElement) {
+        flowController.addConnectionTo(existingElement.flowController);
+        directionController.addConnectionTo(existingElement.directionController);
     }
 
-    @Override
-    public void removeConnectionTo(NetworkElement newElement, NetworkElement existingElement) {
-        flowController.removeConnectionTo(this, existingElement);
-        directionController.removeConnectionTo(this, existingElement);
+
+    public void removeConnectionTo() {
+        flowController.removeConnectionTo();
+        directionController.removeConnectionTo();
     }
 
     public Curve getWaterCurve() {
@@ -97,34 +93,15 @@ public abstract class NetworkElement implements Linked, Updates<WaterConditions>
     }
 
     protected void addToNetwork(List<NetworkElement> networkElements){
-        this.flowController = new OperationController<WaterConditions>();
-        this.directionController = new OperationController<FlowDirection>();
+        this.flowController = new OperationController<WaterConditions>(this);
+        this.directionController = new OperationController<FlowDirection>(this);
         waterConditions = new WaterConditions();
         IDNumber = numberOfElements++;
         connectTo(networkElements);
     }
 
-    public void flowUpdate(NetworkElement sender, NumberedUpdate<WaterConditions> upd){
-        update(sender,upd);
-    }
-
-    public void sendFlowUpdate(WaterConditions upd) {
-        sendUpdate(this, upd);
-    }
-
-    protected void getFlowValues(){
-        waterConditions=(WaterConditions) flowController.getCalculatedValue();
-    };
-
-
-
-    public void connectFrom(NetworkElement networkElement){
-        flowController.connectFrom(networkElement);
-        //directionController.addConnectionAfterFrom(networkElement);
-    }
-
     private void connectTo(List<NetworkElement> networkElements){
-        networkElements.forEach(existingElement -> addConnectionTo(this, existingElement));
+        networkElements.forEach(this::addConnectionTo);
     }
 
 }

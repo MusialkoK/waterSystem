@@ -1,9 +1,7 @@
 package waterSystem.operationController.communicationModule;
 
-import waterSystem.NetworkElement;
-
-public interface Linked {
-    void addConnectionTo(NetworkElement newElement, NetworkElement existingElement);
-    void removeConnectionTo(NetworkElement newElement, NetworkElement existingElement);
+public interface Linked<E> {
+    void addConnectionTo(CommunicationModule<E> existingElement);
+    void removeConnectionTo(CommunicationModule<E> newElement, CommunicationModule<E> existingElement);
 }
 

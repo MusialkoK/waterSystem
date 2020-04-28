@@ -7,10 +7,10 @@ import waterSystem.curve.CurveZones;
 import java.util.List;
 
 public final class LastDevice<E extends WaterConditions> implements CalculationModule<E> {
-    List<WaterConditions> inputData;
-    double multiplier;
-    Curve waterCurve;
-    E calculatedValue;
+    private List<WaterConditions> inputData;
+    private double multiplier;
+    private Curve waterCurve;
+    private E calculatedValue;
 
     public LastDevice(double multiplier, Curve waterCurve) {
         this.multiplier=multiplier;
@@ -18,11 +18,16 @@ public final class LastDevice<E extends WaterConditions> implements CalculationM
     }
 
     @Override
+    public void calculate(List<E> data) {
+        importData(data);
+        makeCalculation();
+    }
+
     public void importData(List<E> data) {
         this.inputData= (List<WaterConditions>) data;
     }
 
-    @Override
+
     public void makeCalculation() {
         double sumFlow = getFlowSum(inputData);
         double sumFlowPerElement = sumFlow/multiplier;

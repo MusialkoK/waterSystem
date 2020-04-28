@@ -8,14 +8,17 @@ public final class PassDirection<E extends FlowDirection> implements Calculation
 
     private E newValue;
 
-    @Override
     public void importData(List<E> data) {
         this.newValue=data.get(0);
     }
 
-    @Override
     public void makeCalculation() {
+    }
 
+    @Override
+    public void calculate(List<E> data) {
+        importData(data);
+        makeCalculation();
     }
 
     @Override

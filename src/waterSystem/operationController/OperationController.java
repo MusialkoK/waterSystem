@@ -1,48 +1,44 @@
 package waterSystem.operationController;
 
-import waterSystem.Updates;
 import waterSystem.NetworkElement;
+import waterSystem.ValueObservable;
+import waterSystem.ValueObserver;
 import waterSystem.operationController.calculationModule.CalculationModule;
-import waterSystem.operationController.communicationModule.Linked;
+import waterSystem.operationController.collectingModule.CollectingModule;
 import waterSystem.operationController.communicationModule.CommunicationModule;
-import waterSystem.operationController.communicationModule.NumberedUpdate;
 
-public class OperationController<E> implements Updates<E>, Linked {
+import java.util.List;
 
-    private CommunicationModule<E> communicationModule = new CommunicationModule<>();
+public class OperationController<E> implements ValueObserver<List<E>>, ValueObservable<E> {
+
+    private final CommunicationModule<E> communicationModule = new CommunicationModule<>(this);
     private CalculationModule<E> calculationModule;
+    private CollectingModule<E> collectingModule;
+    private final NetworkElement owner;
 
-    @Override
-    public void sendUpdate(NetworkElement sender, E upd) {
-        communicationModule.sendUpdate(sender, upd);
+    public OperationController(NetworkElement owner) {
+        this.owner = owner;
     }
 
     @Override
-    public void update(NetworkElement sender, NumberedUpdate<E> upd) {
-        communicationModule.update(sender, upd);
-        calculationModule.calculate(communicationModule.getBeforeValuesByDirection());
+    public void transfer(List<E> value) {
+        calculationModule.calculate(value);
+        sendTransfer();
     }
 
     @Override
-    public void addConnectionTo(NetworkElement newElement, NetworkElement networkElement) {
-        communicationModule.addConnectionTo(newElement, networkElement);
-    }
-
-    @Override
-    public void removeConnectionTo(NetworkElement newElement, NetworkElement existingElement) {
+    public void sendTransfer() {
+        owner.transfer(calculationModule.exportData());
+        owner.transfer(calculationModule.exportSecond());
 
     }
-/*
-    @Override
-    public List<E> getBeforeValuesByDirection() {
-        return null;
+
+    public void addConnectionTo(OperationController<E> existingElement) {
+        communicationModule.addConnectionTo(existingElement.communicationModule);
     }
 
-    @Override
-    public Object getSecondValue() {
-        return null;
-    }
-*/
+    public void removeConnectionTo() {}
+
     public void setCalculationModule(Object obj) {
         this.calculationModule = (CalculationModule<E>) obj;
     }
@@ -55,6 +51,7 @@ public class OperationController<E> implements Updates<E>, Linked {
         return calculationModule.exportSecond();
     }
 
-    public void connectFrom(NetworkElement networkElement) {
+    public void sendUpdate(E upd) {
+        communicationModule.sendUpdate(upd);
     }
 }

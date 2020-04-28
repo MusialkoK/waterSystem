@@ -1,9 +1,9 @@
 package waterSystem.operationController.communicationModule;
 
-import waterSystem.Updates;
+import waterSystem.Communication;
 import waterSystem.FlowDirection;
-import waterSystem.NetworkElement;
-import waterSystem.WaterConditions;
+import waterSystem.ValueObservable;
+import waterSystem.operationController.OperationController;
 
 
 import java.util.*;
@@ -11,16 +11,18 @@ import java.util.stream.Collectors;
 
 import static waterSystem.FlowDirection.*;
 
-public class CommunicationModule<E> implements Linked, Updates<E> {
+public class CommunicationModule<E> implements Linked<E>, Communication<E>, ValueObservable<List<E>> {
 
     private FlowDirection flowDirection;
-    private final Map<NetworkElement, NumberedUpdate<E>> connectionsAfter = new HashMap<>();
-    private final Map<NetworkElement, NumberedUpdate<E>> connectionsBefore = new HashMap<>();
+    private final Map<CommunicationModule<E>, NumberedUpdate<E>> connectionsAfter = new HashMap<>();
+    private final Map<CommunicationModule<E>, NumberedUpdate<E>> connectionsBefore = new HashMap<>();
     private int counterAfter = 0;
     private int counterBefore = 0;
+    private OperationController<E> owner;
 
-    public CommunicationModule() {
+    public CommunicationModule(OperationController<E> owner) {
         this.flowDirection = DIRECT;
+        this.owner=owner;
     }
 
     public FlowDirection getDirection() {
@@ -28,58 +30,59 @@ public class CommunicationModule<E> implements Linked, Updates<E> {
     }
 
 
-    public void addConnectionBefore(NetworkElement existingElement) {
+    public void addConnectionBefore(CommunicationModule<E> existingElement) {
         this.connectionsBefore.put(existingElement, null);
     }
 
-    public void addConnectionAfter(NetworkElement newElement){
-        this.connectionsAfter.put(newElement,null);
+    public void addConnectionAfter(CommunicationModule<E> existingElement){
+        existingElement.connectionsAfter.put(this,null);
     }
 
     @Override
-    public void addConnectionTo(NetworkElement newElement, NetworkElement existingElement) {
+    public void addConnectionTo(CommunicationModule<E> existingElement) {
         addConnectionBefore(existingElement);
-        addConnectionAfter(newElement);
+        addConnectionAfter(existingElement);
     }
 
     @Override
-    public void removeConnectionTo(NetworkElement newElement, NetworkElement existingElement) {
+    public void removeConnectionTo(CommunicationModule<E> newElement, CommunicationModule<E> existingElement) {
 
     }
 
     @Override
-    public void update(NetworkElement sender, NumberedUpdate<E> upd) {
+    public void update(CommunicationModule<E> sender, NumberedUpdate<E> upd) {
         this.getConnectionsByDirectionOpposite().put(sender, upd);
         updateOppositeCounter(upd.getUpdateNumber());
+
     }
 
     @Override
-    public void sendUpdate(NetworkElement sender, E upd) {
+    public void sendUpdate(E upd) {
         int number = connectionsBefore.isEmpty()? ++counterBefore:getNumberByDirectionOpposite();
         NumberedUpdate<E> numberedUpdate = new NumberedUpdate<>(number,upd);
-        getConnectionsByDirection().keySet().forEach(x->x.update(sender, numberedUpdate));
+        getConnectionsByDirection().keySet().forEach(x->x.update(this, numberedUpdate));
     }
 
-    //@Override
-    public List<E> getBeforeValuesByDirection() {
-       if(isUpdateFinished()){
-           return getConnectionsByDirectionOpposite().values().stream()
-                   .map(NumberedUpdate::getValue)
-                   .collect(Collectors.toList());
-       }else{
-           return new ArrayList<>();
-       }
+    @Override
+    public void sendTransfer() {
+        List<E> list= new ArrayList<>();
+        if(isUpdateFinished()){
+            list= getConnectionsByDirectionOpposite().values().stream()
+                    .map(NumberedUpdate::getValue)
+                    .collect(Collectors.toList());
+        }
+        owner.transfer(list);
     }
 
     public void updateDirection(FlowDirection direction){
         this.flowDirection=direction;
     }
 
-    private Map<NetworkElement, NumberedUpdate<E>> getConnectionsByDirection() {
+    private Map<CommunicationModule<E>, NumberedUpdate<E>> getConnectionsByDirection() {
         return (DIRECT.equals(this.flowDirection)) ? this.connectionsAfter : this.connectionsBefore;
     }
 
-    private Map<NetworkElement, NumberedUpdate<E>> getConnectionsByDirectionOpposite() {
+    private Map<CommunicationModule<E>, NumberedUpdate<E>> getConnectionsByDirectionOpposite() {
         return (REVERSE.equals(this.flowDirection)) ? this.connectionsAfter : this.connectionsBefore;
     }
 

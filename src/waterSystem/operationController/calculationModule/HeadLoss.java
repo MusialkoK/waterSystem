@@ -17,11 +17,11 @@ public final class HeadLoss<E extends WaterConditions> implements CalculationMod
 }
 
     @Override
-    public void importData(List<E> data) {
+    public void calculate(List<E> data) {
         this.inputData= (List<WaterConditions>) data;
+        makeCalculation();
     }
 
-    @Override
     public void makeCalculation() {
         WaterConditions wc = inputData.get(0);
         headLoss=(Math.min(headLossByColebrooke(wc.getFlow()),headLossByHazen(wc.getFlow())));

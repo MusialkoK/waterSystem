@@ -42,8 +42,9 @@ public class Pipeline extends NetworkElement {
     }
 
     @Override
-    protected void getFlowValues() {
-        waterConditions = flowController.getCalculatedValue();
-        headLoss = (double) flowController.getCalculatedValueSecond();
+    public void transfer(Object value) {
+        super.transfer(value);
+        if(value instanceof Double) headLoss=(Double) value;
+        sendMessage();
     }
 }
