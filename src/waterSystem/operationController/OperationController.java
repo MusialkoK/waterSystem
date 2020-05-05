@@ -3,9 +3,10 @@ package waterSystem.operationController;
 import waterSystem.NetworkElement;
 import waterSystem.ValueObservable;
 import waterSystem.ValueObserver;
+import waterSystem.WaterConditions;
 import waterSystem.operationController.calculationModule.CalculationModule;
-import waterSystem.operationController.collectingModule.CollectingModule;
 import waterSystem.operationController.communicationModule.CommunicationModule;
+import waterSystem.operationController.splittingModule.SplittingModule;
 
 import java.util.List;
 
@@ -13,7 +14,6 @@ public class OperationController<E> implements ValueObserver<List<E>>, ValueObse
 
     private final CommunicationModule<E> communicationModule = new CommunicationModule<>(this);
     private CalculationModule<E> calculationModule;
-    private CollectingModule<E> collectingModule;
     private final NetworkElement owner;
 
     public OperationController(NetworkElement owner) {
@@ -24,6 +24,7 @@ public class OperationController<E> implements ValueObserver<List<E>>, ValueObse
     public void transfer(List<E> value) {
         calculationModule.calculate(value);
         sendTransfer();
+        sendUpdate(calculationModule.exportData());
     }
 
     @Override
@@ -39,8 +40,10 @@ public class OperationController<E> implements ValueObserver<List<E>>, ValueObse
 
     public void removeConnectionTo() {}
 
-    public void setCalculationModule(Object obj) {
-        this.calculationModule = (CalculationModule<E>) obj;
+    public void setCalculationModule(CalculationModule<E> calculationModule,
+                                     SplittingModule<E> splittingModule) {
+        this.calculationModule = calculationModule;
+        this.communicationModule.setSplittingModule(splittingModule);
     }
 
     public E getCalculatedValue() {

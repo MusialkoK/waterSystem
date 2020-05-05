@@ -4,6 +4,7 @@ import waterSystem.operationController.calculationModule.LastDevice;
 import waterSystem.operationController.calculationModule.PassDirection;
 import waterSystem.models.ModelsLists;
 import waterSystem.models.SprinklerList;
+import waterSystem.operationController.splittingModule.PressureDrivenSplit;
 
 public class Sprinkler extends NetworkElement {
 
@@ -34,6 +35,8 @@ public class Sprinkler extends NetworkElement {
     protected void setModelParameters(ModelsLists model) {
         this.model = model;
         this.waterCurve= this.model.getCurve();
-        setCalculationParameters(new LastDevice<>(multiplier,waterCurve),new PassDirection<>());
+        setCalculationParameters(new LastDevice<>(multiplier,waterCurve),
+                new PressureDrivenSplit<>(),
+                new PassDirection<>());
     }
 }

@@ -4,6 +4,8 @@ package waterSystem;
 import waterSystem.operationController.calculationModule.LastDevice;
 import waterSystem.operationController.calculationModule.PassDirection;
 import waterSystem.models.ModelsLists;
+import waterSystem.operationController.splittingModule.PressureDrivenSplit;
+import waterSystem.operationController.splittingModule.SameToAll;
 
 
 public class Pump extends NetworkElement {
@@ -35,7 +37,9 @@ public class Pump extends NetworkElement {
         this.model = model;
         this.waterCurve = this.model.getCurve();
         this.setMultiplier(1);
-        setCalculationParameters(new LastDevice<>(multiplier,waterCurve),new PassDirection<>());
+        setCalculationParameters(new LastDevice<>(multiplier,waterCurve),
+                new PressureDrivenSplit<>(),
+                new PassDirection<>());
     }
 
     @Override

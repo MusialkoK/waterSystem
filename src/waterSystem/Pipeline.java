@@ -4,6 +4,8 @@ import waterSystem.operationController.calculationModule.HeadLoss;
 import waterSystem.operationController.calculationModule.PassDirection;
 import waterSystem.models.ModelsLists;
 import waterSystem.models.PipelineList;
+import waterSystem.operationController.splittingModule.PressureDrivenSplit;
+import waterSystem.operationController.splittingModule.SameToAll;
 
 
 public class Pipeline extends NetworkElement {
@@ -31,6 +33,7 @@ public class Pipeline extends NetworkElement {
     protected void setModelParameters(ModelsLists model) {
         this.pipelineModel = (PipelineList) model;
         setCalculationParameters(new HeadLoss<>(getPipelineModel().getInternalDiameter(), getLength()),
+                new PressureDrivenSplit<>(),
                 new PassDirection<>());
     }
 

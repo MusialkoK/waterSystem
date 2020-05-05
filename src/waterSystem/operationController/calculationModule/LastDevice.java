@@ -10,7 +10,7 @@ public final class LastDevice<E extends WaterConditions> implements CalculationM
     private List<WaterConditions> inputData;
     private double multiplier;
     private Curve waterCurve;
-    private E calculatedValue;
+    private E calculatedValue = (E) new WaterConditions();
 
     public LastDevice(double multiplier, Curve waterCurve) {
         this.multiplier=multiplier;

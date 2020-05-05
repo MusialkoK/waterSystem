@@ -4,6 +4,8 @@ import waterSystem.operationController.OperationController;
 import waterSystem.operationController.calculationModule.CalculationModule;
 import waterSystem.curve.Curve;
 import waterSystem.models.ModelsLists;
+import waterSystem.operationController.splittingModule.SameToAll;
+import waterSystem.operationController.splittingModule.SplittingModule;
 
 import java.util.List;
 
@@ -13,10 +15,9 @@ public abstract class NetworkElement implements ValueObserver{
     private static int numberOfElements = 0;
 
     protected OperationController flowController;
-    protected OperationController<FlowDirection> directionController;
+    protected OperationController directionController;
     protected int IDNumber;
     protected WaterConditions waterConditions;
-    protected CalculationModule calculationModule;
     protected Curve waterCurve;
     protected ModelsLists model;
     protected double multiplier;
@@ -28,8 +29,8 @@ public abstract class NetworkElement implements ValueObserver{
     }
 
     public NetworkElement create(ModelsLists model, int quantity, List<NetworkElement> networkElements){
-        create(model, networkElements);
         setMultiplier(quantity);
+        create(model, networkElements);
         return this;
     }
 
@@ -75,9 +76,10 @@ public abstract class NetworkElement implements ValueObserver{
     protected abstract void setModelParameters(ModelsLists model);
 
     protected void setCalculationParameters(CalculationModule<WaterConditions> flowModule,
+                                            SplittingModule<WaterConditions> flowSplittingModule,
                                             CalculationModule<FlowDirection> directionModule){
-        this.flowController.setCalculationModule(flowModule);
-        this.directionController.setCalculationModule(directionModule);
+        this.flowController.setCalculationModule(flowModule,flowSplittingModule);
+        this.directionController.setCalculationModule(directionModule,new SameToAll<FlowDirection>());
     }
 
     public void sendMessage(){

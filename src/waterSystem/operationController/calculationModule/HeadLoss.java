@@ -6,10 +6,10 @@ import java.util.List;
 
 public final class HeadLoss<E extends WaterConditions> implements CalculationModule<E> {
     private List<WaterConditions> inputData;
-    private double internalDiameter;
-    private double length;
+    private final double internalDiameter;
+    private final double length;
     private double headLoss;
-    private E calculatedValue;
+    private final E calculatedValue = (E) new WaterConditions();
 
     public HeadLoss(double internalDiameter, double length) {
         this.internalDiameter=internalDiameter;

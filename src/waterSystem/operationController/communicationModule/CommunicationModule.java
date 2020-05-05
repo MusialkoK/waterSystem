@@ -3,7 +3,9 @@ package waterSystem.operationController.communicationModule;
 import waterSystem.Communication;
 import waterSystem.FlowDirection;
 import waterSystem.ValueObservable;
+import waterSystem.WaterConditions;
 import waterSystem.operationController.OperationController;
+import waterSystem.operationController.splittingModule.SplittingModule;
 
 
 import java.util.*;
@@ -18,7 +20,8 @@ public class CommunicationModule<E> implements Linked<E>, Communication<E>, Valu
     private final Map<CommunicationModule<E>, NumberedUpdate<E>> connectionsBefore = new HashMap<>();
     private int counterAfter = 0;
     private int counterBefore = 0;
-    private OperationController<E> owner;
+    private final OperationController<E> owner;
+    private SplittingModule<E> splittingModule;
 
     public CommunicationModule(OperationController<E> owner) {
         this.flowDirection = DIRECT;
@@ -53,25 +56,33 @@ public class CommunicationModule<E> implements Linked<E>, Communication<E>, Valu
     public void update(CommunicationModule<E> sender, NumberedUpdate<E> upd) {
         this.getConnectionsByDirectionOpposite().put(sender, upd);
         updateOppositeCounter(upd.getUpdateNumber());
-
+        sendTransfer();
     }
 
     @Override
     public void sendUpdate(E upd) {
         int number = connectionsBefore.isEmpty()? ++counterBefore:getNumberByDirectionOpposite();
-        NumberedUpdate<E> numberedUpdate = new NumberedUpdate<>(number,upd);
-        getConnectionsByDirection().keySet().forEach(x->x.update(this, numberedUpdate));
+        splittingModule.setConnectionList(getConnectionsByDirection());
+        Map<CommunicationModule<E>, E> noNumberedUpdate = splittingModule.split(upd);
+        Map<CommunicationModule<E>, NumberedUpdate<E>> numberedUpdate=new HashMap<>();
+        noNumberedUpdate.forEach((k,v)->numberedUpdate.put(k,new NumberedUpdate<>(number,v)));
+        numberedUpdate.forEach((k,v)->k.update(this,v));
     }
 
     @Override
     public void sendTransfer() {
-        List<E> list= new ArrayList<>();
         if(isUpdateFinished()){
+            List<E> list;
             list= getConnectionsByDirectionOpposite().values().stream()
                     .map(NumberedUpdate::getValue)
                     .collect(Collectors.toList());
+            owner.transfer(list);
         }
-        owner.transfer(list);
+    }
+
+    public void setSplittingModule(SplittingModule<E> splittingModule) {
+        this.splittingModule=splittingModule;
+        this.splittingModule.setConnectionList(connectionsAfter);
     }
 
     public void updateDirection(FlowDirection direction){
