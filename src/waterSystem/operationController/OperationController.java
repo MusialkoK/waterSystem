@@ -3,7 +3,6 @@ package waterSystem.operationController;
 import waterSystem.NetworkElement;
 import waterSystem.ValueObservable;
 import waterSystem.ValueObserver;
-import waterSystem.WaterConditions;
 import waterSystem.operationController.calculationModule.CalculationModule;
 import waterSystem.operationController.communicationModule.CommunicationModule;
 import waterSystem.operationController.splittingModule.SplittingModule;
@@ -44,14 +43,6 @@ public class OperationController<E> implements ValueObserver<List<E>>, ValueObse
                                      SplittingModule<E> splittingModule) {
         this.calculationModule = calculationModule;
         this.communicationModule.setSplittingModule(splittingModule);
-    }
-
-    public E getCalculatedValue() {
-        return calculationModule.exportData();
-    }
-
-    public Object getCalculatedValueSecond() {
-        return calculationModule.exportSecond();
     }
 
     public void sendUpdate(E upd) {

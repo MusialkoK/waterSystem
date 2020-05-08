@@ -20,6 +20,7 @@ public class PressureDrivenSplit<E extends WaterConditions> implements Splitting
     public Map<CommunicationModule<E>, E> split(E upd) {
         Map<CommunicationModule<E>, E> result = new HashMap<>();
         if(connectionList.containsValue(null)){
+            upd.setFlow(upd.getFlow()/connectionList.size());
             connectionList.forEach((k, v) -> result.put(k, upd));
             return result;
         }

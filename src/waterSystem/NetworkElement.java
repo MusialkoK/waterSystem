@@ -14,8 +14,8 @@ public abstract class NetworkElement implements ValueObserver{
 
     private static int numberOfElements = 0;
 
-    protected OperationController flowController;
-    protected OperationController directionController;
+    protected OperationController<WaterConditions> flowController;
+    protected OperationController<FlowDirection> directionController;
     protected int IDNumber;
     protected WaterConditions waterConditions;
     protected Curve waterCurve;
@@ -95,8 +95,8 @@ public abstract class NetworkElement implements ValueObserver{
     }
 
     protected void addToNetwork(List<NetworkElement> networkElements){
-        this.flowController = new OperationController<WaterConditions>(this);
-        this.directionController = new OperationController<FlowDirection>(this);
+        this.flowController = new OperationController<>(this);
+        this.directionController = new OperationController<>(this);
         waterConditions = new WaterConditions();
         IDNumber = numberOfElements++;
         connectTo(networkElements);

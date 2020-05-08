@@ -48,11 +48,15 @@ public class CurveSection {
     }
 
     public boolean isFlowInRange(double flow) {
-        return (flow >= lowLimit.getFlow() && flow <= highLimit.getFlow());
+        double minFlow = Math.min(lowLimit.getFlow(), highLimit.getFlow());
+        double maxFlow = Math.max(lowLimit.getFlow(), highLimit.getFlow());
+        return (flow >= minFlow && flow <= maxFlow);
     }
 
     public boolean isPressureInRange(double pressure) {
-        return (pressure >= highLimit.getPressure() && pressure <= lowLimit.getPressure());
+        double minPressure = Math.min(lowLimit.getPressure(), highLimit.getPressure());
+        double maxPressure = Math.max(lowLimit.getPressure(), highLimit.getPressure());
+        return (pressure >= minPressure && pressure <= maxPressure);
     }
 
     public double getDistance(WaterConditions waterConditions) {
@@ -63,8 +67,8 @@ public class CurveSection {
         double perpendicularCoefficientA = -1 / coefficientA;
         double perpendicularCoefficientB = waterConditions.getPressure() + waterConditions.getFlow() / coefficientA;
         double flow = (perpendicularCoefficientB - coefficientB) / (coefficientA - perpendicularCoefficientA);
-        if(!isFlowInRange(flow)){
-            flow = Math.abs(flow-getMinFlow())>Math.abs(flow-getMaxFlow())? getMaxFlow():getMinFlow();
+        if (!isFlowInRange(flow)) {
+            flow = Math.abs(flow - getMinFlow()) > Math.abs(flow - getMaxFlow()) ? getMaxFlow() : getMinFlow();
         }
         double pressure = perpendicularCoefficientA * flow + perpendicularCoefficientB;
         return new WaterConditions(flow, pressure);
