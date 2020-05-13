@@ -22,12 +22,7 @@ public final class PassDirection<E extends FlowDirection> implements Calculation
     }
 
     @Override
-    public E exportData() {
-        return newValue;
-    }
-
-    @Override
-    public Object exportSecond() {
-        return null;
+    public TransferObj<E> exportData() {
+        return new TransferObj<>(newValue);
     }
 }

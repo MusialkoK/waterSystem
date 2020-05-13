@@ -23,14 +23,12 @@ public class OperationController<E> implements ValueObserver<List<E>>, ValueObse
     public void transfer(List<E> value) {
         calculationModule.calculate(value);
         sendTransfer();
-        sendUpdate(calculationModule.exportData());
+        sendUpdate(calculationModule.exportData().getMainValue());
     }
 
     @Override
     public void sendTransfer() {
         owner.transfer(calculationModule.exportData());
-        owner.transfer(calculationModule.exportSecond());
-
     }
 
     public void addConnectionTo(OperationController<E> existingElement) {

@@ -31,7 +31,7 @@ public class Network{
         pump.create(model,new ArrayList<>());
         pumps.add((Pump) pump);
         networkElements.add(pump);
-        pump.sendMessage();
+        pump.sendHelloMessage();
     }
 
     public void changePumpTo(PumpsList model) {
@@ -67,7 +67,7 @@ public class Network{
     public void addPipeline(PipelineList model, int length, List<NetworkElement> connections) {
         NetworkElement pipeline = new Pipeline();
         pipeline.create(model, length, connections);
-        pipeline.sendMessage();
+        pipeline.sendHelloMessage();
         networkElements.add(pipeline);
         pipelines.add((Pipeline) pipeline);
     }
@@ -75,7 +75,7 @@ public class Network{
     public void addSprinkler(SprinklerList model, int quantity, List<NetworkElement> connections) {
         NetworkElement sprinkler = new Sprinkler();
         sprinkler.create(model, quantity, connections);
-        sprinkler.sendMessage();
+        sprinkler.sendHelloMessage();
         networkElements.add(sprinkler);
         sprinklers.add((Sprinkler) sprinkler);
     }

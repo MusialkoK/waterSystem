@@ -4,6 +4,7 @@ import waterSystem.operationController.calculationModule.HeadLoss;
 import waterSystem.operationController.calculationModule.PassDirection;
 import waterSystem.models.ModelsLists;
 import waterSystem.models.PipelineList;
+import waterSystem.operationController.calculationModule.TransferObj;
 import waterSystem.operationController.splittingModule.PressureDrivenSplit;
 
 
@@ -34,16 +35,23 @@ public class Pipeline extends NetworkElement {
     }
 
     @Override
-    public void sendMessage() {
-        final String HELLO_PIPELINE_FORMAT = "pipeline %s reporting:\nMy ID: %d\nMy length: %fm\nMy head loss: %fatm\nWater conditions: %s\n";
-        System.out.printf(HELLO_PIPELINE_FORMAT, getName(), getIDNumber(), multiplier, -headLoss, waterConditions.view());
+    public void sendStatusMessage() {
+        final String STATUS_PIPELINE_FORMAT = "pipeline %s reporting:\nMy ID: %d\nMy length: %fm\nMy head loss: %fatm\nWater conditions: %s\n";
+        System.out.printf(STATUS_PIPELINE_FORMAT, getName(), getIDNumber(), multiplier, -headLoss, waterConditions.view());
         System.out.println("-------------------");
     }
 
     @Override
-    public void transfer(Object value) {
+    public void transfer(TransferObj value) {
+        if(value.getMainValue() instanceof WaterConditions){
+            headLoss=(double) value.getSecondaryValues().get(0);
+        }
         super.transfer(value);
-        if(value instanceof Double) headLoss=(Double) value;
-        sendMessage();
+    }
+
+    @Override
+    public void sendHelloMessage() {
+        final String HELLO_SPRINKLER_FORMAT ="ID:%d, %s %fm\n";
+        System.out.printf(HELLO_SPRINKLER_FORMAT,getIDNumber(), getName(), multiplier);
     }
 }

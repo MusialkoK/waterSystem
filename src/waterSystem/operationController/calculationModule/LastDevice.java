@@ -27,8 +27,12 @@ public final class LastDevice<E extends WaterConditions> implements CalculationM
         this.inputData= (List<WaterConditions>) data;
     }
 
+    @Override
+    public TransferObj<E> exportData() {
+        return new TransferObj<>(calculatedValue);
+    }
 
-    public void makeCalculation() {
+    private void makeCalculation() {
         double sumFlow = getFlowSum(inputData);
         double sumFlowPerElement = sumFlow/multiplier;
         double averagePressure = getAveragePressure(inputData);
@@ -37,16 +41,6 @@ public final class LastDevice<E extends WaterConditions> implements CalculationM
         curveStrategy.setWaterCurve(waterCurve);
         WaterConditions waterConditions = curveStrategy.getWaterConditions(sumFlowPerElement, averagePressure);
         calculatedValue.setFlowAndPressure(waterConditions.getFlow()*multiplier,waterConditions.getPressure());
-    }
-
-    @Override
-    public E exportData() {
-        return calculatedValue;
-    }
-
-    @Override
-    public Object exportSecond() {
-        return null;
     }
 
     private double getFlowSum(List<WaterConditions> list) {

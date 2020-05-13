@@ -4,13 +4,14 @@ import waterSystem.operationController.OperationController;
 import waterSystem.operationController.calculationModule.CalculationModule;
 import waterSystem.curve.Curve;
 import waterSystem.models.ModelsLists;
+import waterSystem.operationController.calculationModule.TransferObj;
 import waterSystem.operationController.splittingModule.SameToAll;
 import waterSystem.operationController.splittingModule.SplittingModule;
 
 import java.util.List;
 
 
-public abstract class NetworkElement implements ValueObserver{
+public abstract class NetworkElement implements ValueObserver<TransferObj>{
 
     private static int numberOfElements = 0;
 
@@ -35,16 +36,16 @@ public abstract class NetworkElement implements ValueObserver{
     }
 
     @Override
-    public void transfer(Object value) {
-        if(value instanceof WaterConditions){
-            waterConditions=(WaterConditions) value;
+    public void transfer(TransferObj value) {
+        if(value.getMainValue() instanceof WaterConditions){
+            waterConditions= (WaterConditions) value.getMainValue();
         }
+        sendStatusMessage();
     }
 
     public void sendFlowUpdate(WaterConditions value) {
         flowController.sendUpdate(value);
     }
-
 
     public void addConnectionTo(NetworkElement existingElement) {
         flowController.addConnectionTo(existingElement.flowController);
@@ -82,8 +83,9 @@ public abstract class NetworkElement implements ValueObserver{
         this.directionController.setCalculationModule(directionModule,new SameToAll<FlowDirection>());
     }
 
-    public void sendMessage(){
-    }
+    public abstract void sendStatusMessage();
+
+    public abstract void sendHelloMessage();
 
     public int getIDNumber(){
         return IDNumber;

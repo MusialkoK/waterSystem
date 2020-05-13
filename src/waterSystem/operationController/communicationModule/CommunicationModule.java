@@ -3,7 +3,6 @@ package waterSystem.operationController.communicationModule;
 import waterSystem.Communication;
 import waterSystem.FlowDirection;
 import waterSystem.ValueObservable;
-import waterSystem.WaterConditions;
 import waterSystem.operationController.OperationController;
 import waterSystem.operationController.splittingModule.SplittingModule;
 

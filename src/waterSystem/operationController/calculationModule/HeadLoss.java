@@ -29,13 +29,8 @@ public final class HeadLoss<E extends WaterConditions> implements CalculationMod
     }
 
     @Override
-    public E exportData() {
-        return calculatedValue;
-    }
-
-    @Override
-    public Object exportSecond() {
-        return headLoss;
+    public TransferObj<E> exportData() {
+        return new TransferObj<>(calculatedValue,headLoss);
     }
 
     private double headLossByHazen(double flow){

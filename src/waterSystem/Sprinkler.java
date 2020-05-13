@@ -25,10 +25,16 @@ public class Sprinkler extends NetworkElement {
     }
 
     @Override
-    public void sendMessage() {
-        final String HELLO_SPRINKLER_FORMAT ="sprinkler %s x%d reporting:\nMy ID: %d\nWater conditions: %s\n";
-        System.out.printf(HELLO_SPRINKLER_FORMAT,getName(),(int) multiplier ,getIDNumber(),waterConditions.view());
+    public void sendStatusMessage() {
+        final String STATUS_SPRINKLER_FORMAT ="sprinkler %s x%d reporting:\nMy ID: %d\nWater conditions: %s\n";
+        System.out.printf(STATUS_SPRINKLER_FORMAT,getName(),(int) multiplier ,getIDNumber(),waterConditions.view());
         System.out.println("-------------------");
+    }
+
+    @Override
+    public void sendHelloMessage() {
+        final String HELLO_SPRINKLER_FORMAT ="ID:%d,  %s x%d\n";
+        System.out.printf(HELLO_SPRINKLER_FORMAT,getIDNumber(), getName(),(int) multiplier);
     }
 
     @Override

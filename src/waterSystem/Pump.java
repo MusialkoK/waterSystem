@@ -43,10 +43,16 @@ public class Pump extends NetworkElement {
     }
 
     @Override
-    public void sendMessage() {
-        final String HELLO_PUMP_FORMAT = "pump %s reporting:\nMy ID: %d\nWater conditions: %s\n";
-        System.out.printf(HELLO_PUMP_FORMAT, getName(), getIDNumber(), waterConditions.view());
+    public void sendStatusMessage() {
+        final String STATUS_PUMP_FORMAT = "pump %s reporting:\nMy ID: %d\nWater conditions: %s\n";
+        System.out.printf(STATUS_PUMP_FORMAT, getName(), getIDNumber(), waterConditions.view());
         System.out.println("-------------------");
+    }
+
+    @Override
+    public void sendHelloMessage() {
+        final String HELLO_SPRINKLER_FORMAT ="ID:%d, %s\n";
+        System.out.printf(HELLO_SPRINKLER_FORMAT,getIDNumber(), getName());
     }
 }
 
