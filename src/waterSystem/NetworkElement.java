@@ -36,7 +36,7 @@ public abstract class NetworkElement implements ValueObserver<TransferObj>{
     }
 
     @Override
-    public void transfer(TransferObj value) {
+    public void update(TransferObj value) {
         if(value.getMainValue() instanceof WaterConditions){
             waterConditions= (WaterConditions) value.getMainValue();
         }

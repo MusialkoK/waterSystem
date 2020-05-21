@@ -1,6 +1,5 @@
 package waterSystem.operationController.communicationModule;
 
-import waterSystem.Communication;
 import waterSystem.FlowDirection;
 import waterSystem.ValueObservable;
 import waterSystem.operationController.OperationController;
@@ -12,7 +11,7 @@ import java.util.stream.Collectors;
 
 import static waterSystem.FlowDirection.*;
 
-public class CommunicationModule<E> implements Linked<E>, Communication<E>, ValueObservable<List<E>> {
+public class CommunicationModule<E> implements Communication<E>, ValueObservable<List<E>> {
 
     private FlowDirection flowDirection;
     private final Map<CommunicationModule<E>, NumberedUpdate<E>> connectionsAfter = new HashMap<>();
@@ -52,30 +51,30 @@ public class CommunicationModule<E> implements Linked<E>, Communication<E>, Valu
     }
 
     @Override
-    public void update(CommunicationModule<E> sender, NumberedUpdate<E> upd) {
+    public void transfer(CommunicationModule<E> sender, NumberedUpdate<E> upd) {
         this.getConnectionsByDirectionOpposite().put(sender, upd);
         updateOppositeCounter(upd.getUpdateNumber());
-        sendTransfer();
+        sendUpdate();
     }
 
     @Override
-    public void sendUpdate(E upd) {
+    public void sendTransfer(E upd) {
         int number = connectionsBefore.isEmpty()? ++counterBefore:getNumberByDirectionOpposite();
         splittingModule.setConnectionList(getConnectionsByDirection());
         Map<CommunicationModule<E>, E> noNumberedUpdate = splittingModule.split(upd);
         Map<CommunicationModule<E>, NumberedUpdate<E>> numberedUpdate=new HashMap<>();
         noNumberedUpdate.forEach((k,v)->numberedUpdate.put(k,new NumberedUpdate<>(number,v)));
-        numberedUpdate.forEach((k,v)->k.update(this,v));
+        numberedUpdate.forEach((k,v)->k.transfer(this,v));
     }
 
     @Override
-    public void sendTransfer() {
+    public void sendUpdate() {
         if(isUpdateFinished()){
             List<E> list;
             list= getConnectionsByDirectionOpposite().values().stream()
                     .map(NumberedUpdate::getValue)
                     .collect(Collectors.toList());
-            owner.transfer(list);
+            owner.update(list);
         }
     }
 

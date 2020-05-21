@@ -20,15 +20,15 @@ public class OperationController<E> implements ValueObserver<List<E>>, ValueObse
     }
 
     @Override
-    public void transfer(List<E> value) {
+    public void update(List<E> value) {
         calculationModule.calculate(value);
-        sendTransfer();
+        sendUpdate();
         sendUpdate(calculationModule.exportData().getMainValue());
     }
 
     @Override
-    public void sendTransfer() {
-        owner.transfer(calculationModule.exportData());
+    public void sendUpdate() {
+        owner.update(calculationModule.exportData());
     }
 
     public void addConnectionTo(OperationController<E> existingElement) {
@@ -44,6 +44,6 @@ public class OperationController<E> implements ValueObserver<List<E>>, ValueObse
     }
 
     public void sendUpdate(E upd) {
-        communicationModule.sendUpdate(upd);
+        communicationModule.sendTransfer(upd);
     }
 }

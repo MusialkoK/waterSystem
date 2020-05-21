@@ -42,11 +42,11 @@ public class Pipeline extends NetworkElement {
     }
 
     @Override
-    public void transfer(TransferObj value) {
+    public void update(TransferObj value) {
         if(value.getMainValue() instanceof WaterConditions){
             headLoss=(double) value.getSecondaryValues().get(0);
         }
-        super.transfer(value);
+        super.update(value);
     }
 
     @Override
