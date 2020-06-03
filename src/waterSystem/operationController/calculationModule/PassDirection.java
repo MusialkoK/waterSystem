@@ -1,28 +1,29 @@
 package waterSystem.operationController.calculationModule;
 
-import waterSystem.FlowDirection;
+
+import waterSystem.operationController.communicationModule.Transfer;
 
 import java.util.List;
 
-public final class PassDirection<E extends FlowDirection> implements CalculationModule<E>{
+public final class PassDirection implements CalculationModule {
 
-    private E newValue;
-
-    public void importData(List<E> data) {
-        this.newValue=data.get(0);
-    }
+    private Transfer newValue;
 
     public void makeCalculation() {
     }
 
     @Override
-    public void calculate(List<E> data) {
+    public void calculate(List<Transfer> data) {
         importData(data);
         makeCalculation();
     }
 
     @Override
-    public TransferObj<E> exportData() {
-        return new TransferObj<>(newValue);
+    public Transfer exportData() {
+        return newValue;
+    }
+
+    private void importData(List<Transfer> data) {
+        this.newValue = data.get(0);
     }
 }

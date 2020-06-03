@@ -1,10 +1,11 @@
 package waterSystem.operationController.calculationModule;
 
 
+import waterSystem.operationController.communicationModule.Transfer;
+
 import java.util.List;
 
-public interface CalculationModule<E>  {
-    void calculate(List<E> data);
-    TransferObj<E> exportData();
-    //Object exportSecond();
+public interface CalculationModule  {
+    void calculate(List<Transfer> data);
+    Transfer exportData();
 }

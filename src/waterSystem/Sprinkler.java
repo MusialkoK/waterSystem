@@ -41,8 +41,8 @@ public class Sprinkler extends NetworkElement {
     protected void setModelParameters(ModelsLists model) {
         this.model = model;
         this.waterCurve= this.model.getCurve();
-        setCalculationParameters(new LastDevice<>(multiplier,waterCurve),
-                new PressureDrivenSplit<>(),
-                new PassDirection<>());
+        setCalculationParameters(new LastDevice(multiplier,waterCurve),
+                new PressureDrivenSplit(),
+                new PassDirection());
     }
 }

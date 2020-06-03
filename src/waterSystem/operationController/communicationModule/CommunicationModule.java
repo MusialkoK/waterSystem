@@ -1,29 +1,26 @@
 package waterSystem.operationController.communicationModule;
 
 import waterSystem.FlowDirection;
-import waterSystem.ValueObservable;
 import waterSystem.operationController.OperationController;
 import waterSystem.operationController.splittingModule.SplittingModule;
 
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static waterSystem.FlowDirection.*;
 
-public class CommunicationModule<E> implements Communication<E>, ValueObservable<List<E>> {
+public class CommunicationModule implements Communication {
 
     private FlowDirection flowDirection;
-    private final Map<CommunicationModule<E>, NumberedUpdate<E>> connectionsAfter = new HashMap<>();
-    private final Map<CommunicationModule<E>, NumberedUpdate<E>> connectionsBefore = new HashMap<>();
+    private final Map<CommunicationModule, Transfer> connectionsAfter = new HashMap<>();
+    private final Map<CommunicationModule, Transfer> connectionsBefore = new HashMap<>();
     private int counterAfter = 0;
     private int counterBefore = 0;
-    private final OperationController<E> owner;
-    private SplittingModule<E> splittingModule;
+    private final OperationController owner;
+    private SplittingModule splittingModule;
 
-    public CommunicationModule(OperationController<E> owner) {
+    public CommunicationModule(OperationController owner) {
         this.flowDirection = DIRECT;
-        this.owner=owner;
+        this.owner = owner;
     }
 
     public FlowDirection getDirection() {
@@ -31,67 +28,64 @@ public class CommunicationModule<E> implements Communication<E>, ValueObservable
     }
 
 
-    public void addConnectionBefore(CommunicationModule<E> existingElement) {
+    public void addConnectionBefore(CommunicationModule existingElement) {
         this.connectionsBefore.put(existingElement, null);
     }
 
-    public void addConnectionAfter(CommunicationModule<E> existingElement){
-        existingElement.connectionsAfter.put(this,null);
+    public void addConnectionAfter(CommunicationModule existingElement) {
+        existingElement.connectionsAfter.put(this, null);
     }
 
     @Override
-    public void addConnectionTo(CommunicationModule<E> existingElement) {
+    public void addConnectionTo(CommunicationModule existingElement) {
         addConnectionBefore(existingElement);
         addConnectionAfter(existingElement);
     }
 
     @Override
-    public void removeConnectionTo(CommunicationModule<E> newElement, CommunicationModule<E> existingElement) {
+    public void removeConnectionTo(CommunicationModule newElement, CommunicationModule existingElement) {
 
     }
 
     @Override
-    public void transfer(CommunicationModule<E> sender, NumberedUpdate<E> upd) {
-        this.getConnectionsByDirectionOpposite().put(sender, upd);
-        updateOppositeCounter(upd.getUpdateNumber());
+    public void transfer(CommunicationModule sender, Transfer transfer) {
+        this.getConnectionsByDirectionOpposite().put(sender, transfer);
+        updateOppositeCounter(transfer.getId());
         sendUpdate();
     }
 
     @Override
-    public void sendTransfer(E upd) {
-        int number = connectionsBefore.isEmpty()? ++counterBefore:getNumberByDirectionOpposite();
+    public void sendTransfer(Transfer transfer) {
+        int number = connectionsBefore.isEmpty() ? ++counterBefore : getNumberByDirectionOpposite();
         splittingModule.setConnectionList(getConnectionsByDirection());
-        Map<CommunicationModule<E>, E> noNumberedUpdate = splittingModule.split(upd);
-        Map<CommunicationModule<E>, NumberedUpdate<E>> numberedUpdate=new HashMap<>();
-        noNumberedUpdate.forEach((k,v)->numberedUpdate.put(k,new NumberedUpdate<>(number,v)));
-        numberedUpdate.forEach((k,v)->k.transfer(this,v));
+        Map<CommunicationModule, Transfer> transferMap = splittingModule.split(transfer);
+        transferMap.forEach((k, v) -> {
+            v.setId(number);
+            k.transfer(this, v);
+        });
     }
 
-    @Override
     public void sendUpdate() {
-        if(isUpdateFinished()){
-            List<E> list;
-            list= getConnectionsByDirectionOpposite().values().stream()
-                    .map(NumberedUpdate::getValue)
-                    .collect(Collectors.toList());
+        if (isUpdateFinished()) {
+            List<Transfer> list = new ArrayList<>(getConnectionsByDirectionOpposite().values());
             owner.update(list);
         }
     }
 
-    public void setSplittingModule(SplittingModule<E> splittingModule) {
-        this.splittingModule=splittingModule;
+    public void setSplittingModule(SplittingModule splittingModule) {
+        this.splittingModule = splittingModule;
         this.splittingModule.setConnectionList(connectionsAfter);
     }
 
-    public void updateDirection(FlowDirection direction){
-        this.flowDirection=direction;
+    public void updateDirection(FlowDirection direction) {
+        this.flowDirection = direction;
     }
 
-    private Map<CommunicationModule<E>, NumberedUpdate<E>> getConnectionsByDirection() {
+    private Map<CommunicationModule, Transfer> getConnectionsByDirection() {
         return (DIRECT.equals(this.flowDirection)) ? this.connectionsAfter : this.connectionsBefore;
     }
 
-    private Map<CommunicationModule<E>, NumberedUpdate<E>> getConnectionsByDirectionOpposite() {
+    private Map<CommunicationModule, Transfer> getConnectionsByDirectionOpposite() {
         return (REVERSE.equals(this.flowDirection)) ? this.connectionsAfter : this.connectionsBefore;
     }
 
@@ -127,11 +121,11 @@ public class CommunicationModule<E> implements Communication<E>, ValueObservable
         if (this.getNumberByDirectionOpposite() < counter) this.setNumberByDirectionOpposite(counter);
     }
 
-    private boolean isUpdateFinished(){
+    private boolean isUpdateFinished() {
         int minUpdateCounter = getConnectionsByDirectionOpposite().values().stream()
-                .mapToInt(NumberedUpdate::getUpdateNumber)
+                .mapToInt(Transfer::getId)
                 .min()
                 .getAsInt();
-        return getNumberByDirectionOpposite()==minUpdateCounter;
+        return getNumberByDirectionOpposite() == minUpdateCounter;
     }
 }

@@ -4,58 +4,70 @@ import waterSystem.operationController.OperationController;
 import waterSystem.operationController.calculationModule.CalculationModule;
 import waterSystem.curve.Curve;
 import waterSystem.models.ModelsLists;
-import waterSystem.operationController.calculationModule.TransferObj;
-import waterSystem.operationController.splittingModule.SameToAll;
+import waterSystem.operationController.communicationModule.Transfer;
+
 import waterSystem.operationController.splittingModule.SplittingModule;
 
 import java.util.List;
 
 
-public abstract class NetworkElement implements ValueObserver<TransferObj>{
+public abstract class NetworkElement {
 
     private static int numberOfElements = 0;
 
-    protected OperationController<WaterConditions> flowController;
-    protected OperationController<FlowDirection> directionController;
+    protected OperationController operationController;
     protected int IDNumber;
     protected WaterConditions waterConditions;
+    protected FlowDirection flowDirection;
     protected Curve waterCurve;
     protected ModelsLists model;
     protected double multiplier;
 
-    public NetworkElement create(ModelsLists model, List<NetworkElement> networkElements) {
+    public void create(ModelsLists model, List<NetworkElement> networkElements) {
         addToNetwork(networkElements);
         setModelParameters(model);
-        return this;
     }
 
-    public NetworkElement create(ModelsLists model, int quantity, List<NetworkElement> networkElements){
+    public void create(ModelsLists model, int quantity, List<NetworkElement> networkElements) {
         setMultiplier(quantity);
         create(model, networkElements);
-        return this;
     }
 
-    @Override
-    public void update(TransferObj value) {
-        if(value.getMainValue() instanceof WaterConditions){
-            waterConditions= (WaterConditions) value.getMainValue();
-        }
+
+    public void updateWaterCondition(Transfer value) {
+        waterConditions = value.getWaterConditions();
         sendStatusMessage();
     }
 
-    public void sendFlowUpdate(WaterConditions value) {
-        flowController.sendUpdate(value);
+    public void updateFlowDirection(Transfer value) {
+        flowDirection = value.getFlowDirection();
+        sendStatusMessage();
+    }
+
+    public void sendWaterConditionTransfer() {
+        Transfer transfer = new Transfer();
+        transfer.setWaterConditions(waterConditions);
+        operationController.sendTransfer(transfer);
+    }
+
+    public void sendWaterConditionTransfer(WaterConditions waterConditions) {
+        Transfer transfer = new Transfer();
+        transfer.setWaterConditions(waterConditions);
+        operationController.sendTransfer(transfer);
+    }
+
+    public void sendFlowDirectionTransfer() {
+        Transfer transfer = new Transfer();
+        transfer.setFlowDirection(flowDirection);
+        operationController.sendTransfer(transfer);
     }
 
     public void addConnectionTo(NetworkElement existingElement) {
-        flowController.addConnectionTo(existingElement.flowController);
-        directionController.addConnectionTo(existingElement.directionController);
+        operationController.addConnectionTo(existingElement.operationController);
     }
 
-
     public void removeConnectionTo() {
-        flowController.removeConnectionTo();
-        directionController.removeConnectionTo();
+        operationController.removeConnectionTo();
     }
 
     public Curve getWaterCurve() {
@@ -66,8 +78,8 @@ public abstract class NetworkElement implements ValueObserver<TransferObj>{
         this.waterConditions.setFlowAndPressure(flow, pressure);
     }
 
-    public void setWaterConditions(WaterConditions waterConditions){
-        setWaterConditions(waterConditions.getFlow(),waterConditions.getPressure());
+    public void setWaterConditions(WaterConditions waterConditions) {
+        setWaterConditions(waterConditions.getFlow(), waterConditions.getPressure());
     }
 
     public WaterConditions getWaterConditions() {
@@ -76,35 +88,35 @@ public abstract class NetworkElement implements ValueObserver<TransferObj>{
 
     protected abstract void setModelParameters(ModelsLists model);
 
-    protected void setCalculationParameters(CalculationModule<WaterConditions> flowModule,
-                                            SplittingModule<WaterConditions> flowSplittingModule,
-                                            CalculationModule<FlowDirection> directionModule){
-        this.flowController.setCalculationModule(flowModule,flowSplittingModule);
-        this.directionController.setCalculationModule(directionModule,new SameToAll<FlowDirection>());
+    protected void setCalculationParameters(CalculationModule flowModule,
+                                            SplittingModule flowSplittingModule,
+                                            CalculationModule directionModule) {
+        this.operationController.setWaterConditionsCalculationModule(flowModule, flowSplittingModule);
+        this.operationController.setFlowDirectionCalculationModule(directionModule);
+
     }
 
     public abstract void sendStatusMessage();
 
     public abstract void sendHelloMessage();
 
-    public int getIDNumber(){
+    public int getIDNumber() {
         return IDNumber;
     }
 
 
     protected void setMultiplier(double multiplier) {
-        this.multiplier=multiplier;
+        this.multiplier = multiplier;
     }
 
-    protected void addToNetwork(List<NetworkElement> networkElements){
-        this.flowController = new OperationController<>(this);
-        this.directionController = new OperationController<>(this);
+    protected void addToNetwork(List<NetworkElement> networkElements) {
+        this.operationController = new OperationController(this);
         waterConditions = new WaterConditions();
         IDNumber = numberOfElements++;
         connectTo(networkElements);
     }
 
-    private void connectTo(List<NetworkElement> networkElements){
+    private void connectTo(List<NetworkElement> networkElements) {
         networkElements.forEach(this::addConnectionTo);
     }
 

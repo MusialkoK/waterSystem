@@ -4,13 +4,17 @@ import waterSystem.WaterConditions;
 import waterSystem.operationController.calculationModule.inCurveStrategies.CurveStrategy;
 import waterSystem.curve.Curve;
 import waterSystem.curve.CurveZones;
-import java.util.List;
+import waterSystem.operationController.communicationModule.Transfer;
 
-public final class LastDevice<E extends WaterConditions> implements CalculationModule<E> {
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+public final class LastDevice implements CalculationModule {
     private List<WaterConditions> inputData;
-    private double multiplier;
-    private Curve waterCurve;
-    private E calculatedValue = (E) new WaterConditions();
+    private final double multiplier;
+    private final Curve waterCurve;
+    private final WaterConditions calculatedValue = new WaterConditions();
 
     public LastDevice(double multiplier, Curve waterCurve) {
         this.multiplier=multiplier;
@@ -18,18 +22,17 @@ public final class LastDevice<E extends WaterConditions> implements CalculationM
     }
 
     @Override
-    public void calculate(List<E> data) {
+    public void calculate(List<Transfer> data) {
         importData(data);
         makeCalculation();
     }
 
-    public void importData(List<E> data) {
-        this.inputData= (List<WaterConditions>) data;
-    }
-
     @Override
-    public TransferObj<E> exportData() {
-        return new TransferObj<>(calculatedValue);
+    public Transfer exportData() {
+        Transfer waterConditionTransfer = new Transfer();
+        waterConditionTransfer.setWaterConditions(calculatedValue);
+        waterConditionTransfer.setChangeDirection(true);
+        return waterConditionTransfer;
     }
 
     private void makeCalculation() {
@@ -49,5 +52,11 @@ public final class LastDevice<E extends WaterConditions> implements CalculationM
 
     private double getAveragePressure(List<WaterConditions> list) {
         return list.size() > 0 ? list.stream().mapToDouble(WaterConditions::getPressure).sum() / list.size() : 0;
+    }
+
+    private void importData(List<Transfer> transfer) {
+            this.inputData = transfer.stream()
+            .map(Transfer::getWaterConditions)
+            .collect(Collectors.toList());
     }
 }

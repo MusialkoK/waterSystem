@@ -1,11 +1,13 @@
 package waterSystem.operationController.splittingModule;
 
 import waterSystem.operationController.communicationModule.CommunicationModule;
-import waterSystem.operationController.communicationModule.NumberedUpdate;
+
+import waterSystem.operationController.communicationModule.Transfer;
 
 import java.util.Map;
 
-public interface SplittingModule<E> {
-    public void setConnectionList(Map<CommunicationModule<E>, NumberedUpdate<E>> connectionList);
-    Map<CommunicationModule<E>, E> split(E upd);
+public interface SplittingModule {
+    void setConnectionList(Map<CommunicationModule, Transfer> connectionList);
+
+    Map<CommunicationModule, Transfer> split(Transfer transfer);
 }
