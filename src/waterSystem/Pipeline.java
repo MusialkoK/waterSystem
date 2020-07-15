@@ -4,7 +4,7 @@ import waterSystem.operationController.calculationModule.HeadLoss;
 import waterSystem.operationController.calculationModule.PassDirection;
 import waterSystem.models.ModelsLists;
 import waterSystem.models.PipelineList;
-import waterSystem.operationController.communicationModule.Transfer;
+import waterSystem.operationController.communicationModule.TransferBox;
 import waterSystem.operationController.splittingModule.PressureDrivenSplit;
 
 
@@ -41,7 +41,7 @@ public class Pipeline extends NetworkElement {
     }
 
     @Override
-    public void updateWaterCondition(Transfer value) {
+    public void updateWaterCondition(TransferBox value) {
         headLoss = value.getHeadLoss();
         super.updateWaterCondition(value);
     }

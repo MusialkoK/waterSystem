@@ -11,10 +11,11 @@ import static waterSystem.FlowDirection.*;
 public class CommunicationModule implements Communication {
 
     private FlowDirection flowDirection;
-    private final Map<CommunicationModule, Transfer> connectionsAfter = new HashMap<>();
-    private final Map<CommunicationModule, Transfer> connectionsBefore = new HashMap<>();
-    private int counterAfter = 0;
-    private int counterBefore = 0;
+    private final Map<CommunicationModule, TransferBox> connectionsAfterElement = new HashMap<>();
+    private final Map<CommunicationModule, TransferBox> connectionsBeforeElement = new HashMap<>();
+    private int finishedReverseTransfers = 0;
+    private int finishedDirectTransfers = 0;
+    private int currentTransferNumber = 0;
     private final OperationController owner;
     private SplittingModule splittingModule;
 
@@ -29,11 +30,11 @@ public class CommunicationModule implements Communication {
 
 
     public void addConnectionBefore(CommunicationModule existingElement) {
-        this.connectionsBefore.put(existingElement, null);
+        this.connectionsBeforeElement.put(existingElement, null);
     }
 
     public void addConnectionAfter(CommunicationModule existingElement) {
-        existingElement.connectionsAfter.put(this, null);
+        existingElement.connectionsAfterElement.put(this, null);
     }
 
     @Override
@@ -48,68 +49,77 @@ public class CommunicationModule implements Communication {
     }
 
     @Override
-    public void transfer(CommunicationModule sender, Transfer transfer) {
-        this.getConnectionsByDirectionOpposite().put(sender, transfer);
-        updateOppositeCounter(transfer.getId());
+    public void transfer(CommunicationModule sender, TransferBox transferBox) {
+        this.getConnectionsByDirectionOpposite().put(sender, transferBox);
+        updateOppositeCounter(transferBox.getId());
         sendUpdate();
     }
 
     @Override
-    public void sendTransfer(Transfer transfer) {
-        int number = connectionsBefore.isEmpty() ? ++counterBefore : getNumberByDirectionOpposite();
-        splittingModule.setConnectionList(getConnectionsByDirection());
-        Map<CommunicationModule, Transfer> transferMap = splittingModule.split(transfer);
+    public void sendTransfer(TransferBox transferBox) {
+        setCurrentTransferNumber();
+        Map<CommunicationModule, TransferBox> transferMap = splittingModule.split(transferBox, getConnectionsByDirection());
         transferMap.forEach((k, v) -> {
-            v.setId(number);
+            v.setId(currentTransferNumber);
             k.transfer(this, v);
         });
     }
 
+    private void setCurrentTransferNumber() {
+        switch (flowDirection) {
+            case DIRECT:
+                currentTransferNumber = connectionsBeforeElement.isEmpty() ? ++finishedDirectTransfers : finishedDirectTransfers;
+                break;
+            case REVERSE:
+                currentTransferNumber = connectionsAfterElement.isEmpty() ? ++finishedReverseTransfers : finishedReverseTransfers;
+                break;
+        }
+    }
+
     public void sendUpdate() {
         if (isUpdateFinished()) {
-            List<Transfer> list = new ArrayList<>(getConnectionsByDirectionOpposite().values());
+            List<TransferBox> list = new ArrayList<>(getConnectionsByDirectionOpposite().values());
             owner.update(list);
         }
     }
 
     public void setSplittingModule(SplittingModule splittingModule) {
         this.splittingModule = splittingModule;
-        this.splittingModule.setConnectionList(connectionsAfter);
     }
 
     public void updateDirection(FlowDirection direction) {
         this.flowDirection = direction;
     }
 
-    private Map<CommunicationModule, Transfer> getConnectionsByDirection() {
-        return (DIRECT.equals(this.flowDirection)) ? this.connectionsAfter : this.connectionsBefore;
+    private Map<CommunicationModule, TransferBox> getConnectionsByDirection() {
+        return (DIRECT.equals(this.flowDirection)) ? this.connectionsAfterElement : this.connectionsBeforeElement;
     }
 
-    private Map<CommunicationModule, Transfer> getConnectionsByDirectionOpposite() {
-        return (REVERSE.equals(this.flowDirection)) ? this.connectionsAfter : this.connectionsBefore;
+    private Map<CommunicationModule, TransferBox> getConnectionsByDirectionOpposite() {
+        return (REVERSE.equals(this.flowDirection)) ? this.connectionsAfterElement : this.connectionsBeforeElement;
     }
 
     private int getNumberByDirection() {
-        return (DIRECT.equals(this.flowDirection)) ? this.counterAfter : this.counterBefore;
+        return (DIRECT.equals(this.flowDirection)) ? this.finishedReverseTransfers : this.finishedDirectTransfers;
     }
 
     private int getNumberByDirectionOpposite() {
-        return (REVERSE.equals(this.flowDirection)) ? this.counterAfter : this.counterBefore;
+        return (REVERSE.equals(this.flowDirection)) ? this.finishedReverseTransfers : this.finishedDirectTransfers;
     }
 
     private void setNumberByDirection(int counter) {
         if (DIRECT.equals(this.flowDirection)) {
-            counterAfter = counter;
+            finishedReverseTransfers = counter;
         } else {
-            counterBefore = counter;
+            finishedDirectTransfers = counter;
         }
     }
 
     private void setNumberByDirectionOpposite(int counter) {
         if (REVERSE.equals(this.flowDirection)) {
-            counterAfter = counter;
+            finishedReverseTransfers = counter;
         } else {
-            counterBefore = counter;
+            finishedDirectTransfers = counter;
         }
     }
 
@@ -123,7 +133,7 @@ public class CommunicationModule implements Communication {
 
     private boolean isUpdateFinished() {
         int minUpdateCounter = getConnectionsByDirectionOpposite().values().stream()
-                .mapToInt(Transfer::getId)
+                .mapToInt(TransferBox::getId)
                 .min()
                 .getAsInt();
         return getNumberByDirectionOpposite() == minUpdateCounter;

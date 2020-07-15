@@ -1,7 +1,7 @@
 package waterSystem.operationController.calculationModule;
 
 import waterSystem.WaterConditions;
-import waterSystem.operationController.communicationModule.Transfer;
+import waterSystem.operationController.communicationModule.TransferBox;
 
 
 import java.util.List;
@@ -20,7 +20,7 @@ public final class HeadLoss implements CalculationModule {
     }
 
     @Override
-    public void calculate(List<Transfer> data) {
+    public void calculate(List<TransferBox> data) {
         importData(data);
         makeCalculation();
     }
@@ -32,11 +32,11 @@ public final class HeadLoss implements CalculationModule {
     }
 
     @Override
-    public Transfer exportData() {
-        Transfer waterConditionTransfer = new Transfer();
-        waterConditionTransfer.setWaterConditions(calculatedValue);
-        waterConditionTransfer.setHeadLoss(headLoss);
-        return waterConditionTransfer;
+    public TransferBox getTransferBox() {
+        TransferBox waterConditionTransferBox = new TransferBox();
+        waterConditionTransferBox.setWaterConditions(calculatedValue);
+        waterConditionTransferBox.setHeadLoss(headLoss);
+        return waterConditionTransferBox;
     }
 
     private double headLossByHazen(double flow) {
@@ -47,9 +47,9 @@ public final class HeadLoss implements CalculationModule {
         return -(Math.pow(10, 9) * Math.pow(internalDiameter, -4.87) * 1.131 * Math.pow(flow / 135, 1.852) * length / 10);
     }
 
-    private void importData(List<Transfer> transfer) {
-        this.inputData = transfer.stream()
-                .map(Transfer::getWaterConditions)
+    private void importData(List<TransferBox> transferBox) {
+        this.inputData = transferBox.stream()
+                .map(TransferBox::getWaterConditions)
                 .collect(Collectors.toList());
     }
 }

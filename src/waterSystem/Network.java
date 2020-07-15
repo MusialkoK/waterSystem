@@ -28,7 +28,7 @@ public class Network{
 
     public void addPump(PumpsList model) {
         NetworkElement pump = new Pump();
-        pump.create(model,new ArrayList<>());
+        pump.create(model);
         pumps.add((Pump) pump);
         networkElements.add(pump);
         pump.sendHelloMessage();

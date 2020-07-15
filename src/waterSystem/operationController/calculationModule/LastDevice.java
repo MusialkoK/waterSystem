@@ -4,7 +4,7 @@ import waterSystem.WaterConditions;
 import waterSystem.operationController.calculationModule.inCurveStrategies.CurveStrategy;
 import waterSystem.curve.Curve;
 import waterSystem.curve.CurveZones;
-import waterSystem.operationController.communicationModule.Transfer;
+import waterSystem.operationController.communicationModule.TransferBox;
 
 
 import java.util.List;
@@ -22,14 +22,14 @@ public final class LastDevice implements CalculationModule {
     }
 
     @Override
-    public void calculate(List<Transfer> data) {
+    public void calculate(List<TransferBox> data) {
         importData(data);
         makeCalculation();
     }
 
     @Override
-    public Transfer exportData() {
-        Transfer waterConditionTransfer = new Transfer();
+    public TransferBox getTransferBox() {
+        TransferBox waterConditionTransfer = new TransferBox();
         waterConditionTransfer.setWaterConditions(calculatedValue);
         waterConditionTransfer.setChangeDirection(true);
         return waterConditionTransfer;
@@ -54,9 +54,9 @@ public final class LastDevice implements CalculationModule {
         return list.size() > 0 ? list.stream().mapToDouble(WaterConditions::getPressure).sum() / list.size() : 0;
     }
 
-    private void importData(List<Transfer> transfer) {
-            this.inputData = transfer.stream()
-            .map(Transfer::getWaterConditions)
+    private void importData(List<TransferBox> transfers) {
+            this.inputData = transfers.stream()
+            .map(TransferBox::getWaterConditions)
             .collect(Collectors.toList());
     }
 }

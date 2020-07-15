@@ -3,17 +3,17 @@ package waterSystem.operationController.communicationModule;
 import waterSystem.FlowDirection;
 import waterSystem.WaterConditions;
 
-public class Transfer {
-    private int id;
+public class TransferBox {
+    private int id;  //use to check if current transfer is finished within one NetworkElement
     protected FlowDirection flowDirection;
     protected WaterConditions waterConditions;
     protected boolean changeDirection;
     protected double headLoss;
 
-    public Transfer() {
+    public TransferBox() {
     }
 
-    public Transfer(double flow, double pressure){
+    public TransferBox(double flow, double pressure){
         setWaterConditions(new WaterConditions(flow,pressure));
     }
 

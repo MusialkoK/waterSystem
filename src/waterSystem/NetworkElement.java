@@ -4,10 +4,11 @@ import waterSystem.operationController.OperationController;
 import waterSystem.operationController.calculationModule.CalculationModule;
 import waterSystem.curve.Curve;
 import waterSystem.models.ModelsLists;
-import waterSystem.operationController.communicationModule.Transfer;
+import waterSystem.operationController.communicationModule.TransferBox;
 
 import waterSystem.operationController.splittingModule.SplittingModule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,33 +34,35 @@ public abstract class NetworkElement {
         create(model, networkElements);
     }
 
+    public void create(ModelsLists model){
+        create(model,new ArrayList<>());
+    }
 
-    public void updateWaterCondition(Transfer value) {
+    public void updateWaterCondition(TransferBox value) {
         waterConditions = value.getWaterConditions();
         sendStatusMessage();
+        TransferBox transferBox = new TransferBox();
+        transferBox.setWaterConditions(waterConditions);
+        sendTransfer(transferBox);
     }
 
-    public void updateFlowDirection(Transfer value) {
-        flowDirection = value.getFlowDirection();
-        sendStatusMessage();
+    public void updateFlowDirection(TransferBox value) {
+        if(value.isChangeDirection()){
+            flowDirection=value.getFlowDirection();
+            sendStatusMessage();
+        }
     }
 
-    public void sendWaterConditionTransfer() {
-        Transfer transfer = new Transfer();
-        transfer.setWaterConditions(waterConditions);
-        operationController.sendTransfer(transfer);
-    }
-
-    public void sendWaterConditionTransfer(WaterConditions waterConditions) {
-        Transfer transfer = new Transfer();
-        transfer.setWaterConditions(waterConditions);
-        operationController.sendTransfer(transfer);
+    public void startWaterFlow() {
+        TransferBox transferBox = new TransferBox();
+        transferBox.setWaterConditions(waterConditions);
+        sendTransfer(transferBox);
     }
 
     public void sendFlowDirectionTransfer() {
-        Transfer transfer = new Transfer();
-        transfer.setFlowDirection(flowDirection);
-        operationController.sendTransfer(transfer);
+        TransferBox transferBox = new TransferBox();
+        transferBox.setFlowDirection(flowDirection);
+        operationController.sendTransfer(transferBox);
     }
 
     public void addConnectionTo(NetworkElement existingElement) {
@@ -120,4 +123,7 @@ public abstract class NetworkElement {
         networkElements.forEach(this::addConnectionTo);
     }
 
+    private void sendTransfer(TransferBox transferBox){
+        operationController.sendTransfer(transferBox);
+    }
 }

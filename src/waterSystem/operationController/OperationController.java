@@ -3,7 +3,7 @@ package waterSystem.operationController;
 import waterSystem.NetworkElement;
 import waterSystem.operationController.calculationModule.CalculationModule;
 import waterSystem.operationController.communicationModule.CommunicationModule;
-import waterSystem.operationController.communicationModule.Transfer;
+import waterSystem.operationController.communicationModule.TransferBox;
 import waterSystem.operationController.splittingModule.SameToAll;
 import waterSystem.operationController.splittingModule.SplittingModule;
 
@@ -21,12 +21,12 @@ public class OperationController {
     }
 
 
-    public void update(List<Transfer> update) {
+    public void update(List<TransferBox> update) {
         waterConditionsCalculationModule.calculate(update);
-        owner.updateWaterCondition(waterConditionsCalculationModule.exportData());
+        owner.updateWaterCondition(waterConditionsCalculationModule.getTransferBox());
 
         flowDirectionCalculationModule.calculate(update);
-        owner.updateFlowDirection(flowDirectionCalculationModule.exportData());
+        owner.updateFlowDirection(flowDirectionCalculationModule.getTransferBox());
 
     }
 
@@ -48,7 +48,7 @@ public class OperationController {
         this.communicationModule.setSplittingModule(new SameToAll());
     }
 
-    public void sendTransfer(Transfer transfer) {
-        communicationModule.sendTransfer(transfer);
+    public void sendTransfer(TransferBox transferBox) {
+        communicationModule.sendTransfer(transferBox);
     }
 }
